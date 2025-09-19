@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom"; // <-- Importar
 import "../styles/Resultados.css";
 import { usePlanta } from "../contexts/usePlanta";
+import { HeartIcon } from "../components/icons/Icons";
 
 export default function Resultados() {
   const navigate = useNavigate();
@@ -73,7 +74,7 @@ export default function Resultados() {
                 className="btn-favorito"
                 onClick={() => agregarFavorito(planta.id)}
               >
-                ❤️
+                <HeartIcon color="red" />
               </button>
             </div>
           </div>
