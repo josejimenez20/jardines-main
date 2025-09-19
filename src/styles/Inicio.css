@@ -1,0 +1,133 @@
+:root {
+  --color-light-green: #A3B18A;
+  --color-cream: #F6EEC9;
+  --color-brown: #7F5539;
+  --color-light-brown: #A57D5D;
+  --color-pale-ivory: #FAF3E0;
+  --color-gray: #6C757D;
+  --color-mint: #D4E2C3;
+  --color-off-white: #FAF8EF;
+  --color-white: #FFFCF5;
+  --color-light-gray: #A0A7B0;
+}
+
+body {
+  background-color: var(--color-off-white);
+  color: var(--color-brown);
+}
+
+/* ---------- MAIN ---------- */
+.main-content {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px 25px;
+  background-color: var(--color-off-white);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  min-height: calc(100vh - 140px);
+}
+
+.main-content h1 {
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 24px;
+  color: var(--color-brown);
+  font-weight: bold;
+}
+
+.info-text {
+  text-align: center;
+  margin-bottom: 28px;
+  color: var(--color-light-brown);
+}
+
+/* ---------- BOTONES ---------- */
+.toggle-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background-color: var(--color-light-green);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-mint);
+  color: var(--color-brown);
+  transform: scale(1.05);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-brown);
+  border: 2px solid var(--color-light-green);
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-mint);
+  color: var(--color-brown);
+  transform: scale(1.05);
+}
+
+/* ---------- FORMULARIO ---------- */
+.reco-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reco-form label {
+  font-weight: 600;
+  color: var(--color-brown);
+}
+
+.reco-form input[type="text"] {
+  padding: 10px;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-mint);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.reco-form input:focus {
+  border-color: var(--color-light-green);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(163, 177, 138, 0.25);
+}
+
+.reco-form input[readonly] {
+  background-color: #f3f3f3;
+  color: #777;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .toggle-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toggle-buttons button {
+    width: 100%;
+  }
+
+  .main-content {
+    margin: 20px;
+    padding: 20px;
+  }
+}

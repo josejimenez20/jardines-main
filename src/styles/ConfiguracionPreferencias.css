@@ -1,0 +1,128 @@
+:root {
+  --color-light-green: #A3B18A;
+  --color-cream: #F6EEC9;
+  --color-brown: #7F5539;
+  --color-light-brown: #A57D5D;
+  --color-gray: #6C757D;
+  --color-mint: #D4E2C3;
+  --color-white: #FFFCF5;
+  --color-green-strong: #7F5539;
+}
+
+.preferences-main {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 30px 25px;
+  background-color: var(--color-white);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: var(--color-brown);
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.info-text {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--color-gray);
+}
+
+#progressText {
+  margin-bottom: 20px;
+  color: var(--color-light-brown);
+  font-weight: 500;
+  text-align: center;
+}
+
+/* PREGUNTAS */
+.question {
+  margin-bottom: 32px;
+}
+
+.question p {
+  font-weight: bold;
+  color: var(--color-brown);
+  margin-bottom: 10px;
+}
+
+/* BOTONES DE OPCIÓN */
+.option {
+  padding: 12px 22px;
+  font-weight: 600;
+  border: 2px solid #A0A7B0;
+  border-radius: 999px;
+  background-color: #ffffff;
+  color: var(--color-brown);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin: 5px;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.option:hover {
+  background-color: var(--color-mint);
+  transform: scale(1.04);
+  border-color: var(--color-light-green);
+}
+
+.option.selected {
+  background: linear-gradient(145deg, var(--color-green-strong), var(--color-light-brown));
+  color: white;
+  border-color: var(--color-brown);
+  font-weight: bold;
+  transform: scale(1.06);
+  box-shadow: 0 6px 12px rgba(235, 238, 229, 0.3);
+}
+
+/* BOTÓN DE CONTINUAR */
+.submit-button {
+  margin-top: 30px;
+  width: 100%;
+  padding: 14px;
+  font-weight: bold;
+  background-color: var(--color-light-green);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.submit-button:hover {
+  background-color: var(--color-green-strong);
+  transform: scale(1.03);
+  box-shadow: 0 6px 14px rgba(107, 142, 35, 0.25);
+}
+
+.submit-button:disabled {
+  background-color: #ddd;
+  color: #aaa;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .preferences-main {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .option {
+    width: 100%;
+  }
+}

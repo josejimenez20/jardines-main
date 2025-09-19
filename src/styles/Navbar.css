@@ -1,0 +1,66 @@
+.navbar {
+  background-color: var(--color-cream);
+  border-bottom: 2px solid var(--color-light-green);
+  padding: 18px 0;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-logo img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.titulo-app {
+  font-weight: 700;
+  color: var(--color-brown);
+  font-size: 20px;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+nav li a,
+nav li button {
+  padding: 10px 18px;
+  font-weight: 600;
+  background-color: var(--color-cream);
+  color: var(--color-brown);
+  border: 2px solid var(--color-light-brown);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+}
+
+nav li a:hover,
+nav li button:hover {
+  background-color: var(--color-mint);
+  color: var(--color-brown);
+}

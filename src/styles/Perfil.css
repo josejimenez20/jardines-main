@@ -1,0 +1,158 @@
+body, .perfil-card {
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  background-color: #f8f5f2;
+}
+
+.perfil-wrapper {
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.perfil-card {
+  background-color: #fff;
+  border-radius: 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  padding: 40px 32px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  border-top: 6px solid #7f5539;
+}
+
+.perfil-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+
+.perfil-card h2 {
+  font-size: 26px;
+  color: #6e3b28;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.perfil-card h2 span {
+  color: #7f5539;
+}
+
+.email {
+  color: #7f5539;
+  margin-bottom: 24px;
+  font-size: 15px;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+  margin-top: 12px;
+}
+
+input[type="email"],
+input[type="password"] {
+  padding: 12px 14px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  font-size: 18px;
+  background-color: #fcfcfc;
+  transition: all 0.25s ease;
+}
+
+input:focus {
+  border-color: #a3b18a;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(163, 177, 138, 0.25);
+}
+
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background-color: #7f9c68;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #6a8556;
+  transform: scale(1.04);
+}
+
+.btn-danger {
+  background-color: #e76f51;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 18px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+  background-color: #c74b2c;
+  transform: scale(1.03);
+}
+
+.formulario h3 {
+  font-size: 20px;
+  margin: 10px 0 6px;
+  color: #5c4033;
+  font-weight: bold;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #e4dcd6;
+  margin: 30px 0;
+}
+
+.back-home {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 28px;
+  color: #7f5539;
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.back-home:hover {
+  background-color: #e0e0e0;
+  color: #5c4033;
+  transform: scale(1.1);
+}
+
+@media (max-width: 600px) {
+  .perfil-card {
+    padding: 30px 20px;
+  }
+
+  .perfil-card h2 {
+    font-size: 22px;
+  }
+
+  .formulario h3 {
+    font-size: 18px;
+  }
+
+  input[type="email"],
+  input[type="password"],
+  button {
+    font-size: 17px;
+  }
+}

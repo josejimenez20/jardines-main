@@ -1,0 +1,175 @@
+:root {
+  --color-light-green: #A3B18A;
+  --color-cream: #F6EEC9;
+  --color-brown: #7F5539;
+  --color-pale-ivory: #FAF3E0;
+  --color-gray: #6C757D;
+  --color-mint: #D4E2C3;
+  --color-off-white: #FAF8EF;
+  --color-light-brown: #A57D5D;
+  --color-white: #FFFCF5;
+  --color-light-gray: #A0A7B0;
+}
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: var(--color-off-white);
+  color: var(--color-brown);
+}
+
+/* Header limpio */
+.favoritas-header {
+  background-color: var(--color-cream);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid var(--color-light-green);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo img {
+  width: 36px;
+  height: 36px;
+}
+
+.titulo-app {
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-brown);
+}
+
+/* Main */
+.favoritas-main {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.favoritas-main h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--color-brown);
+}
+
+/* Alert info */
+.alert-info {
+  background-color: var(--color-cream);
+  border: 1px solid var(--color-light-green);
+  color: var(--color-brown);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+/* Grid de plantas */
+.plant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.plant-card {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-light-gray);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.plant-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+}
+
+.plant-image {
+  height: 160px;
+  background-color: var(--color-pale-ivory);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plant-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plant-info {
+  padding: 16px;
+}
+
+.plant-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.plant-scientific {
+  font-style: italic;
+  color: var(--color-gray);
+  margin-bottom: 10px;
+}
+
+.plant-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.plant-tag {
+  background-color: var(--color-mint);
+  color: var(--color-brown);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+/* Botón eliminar */
+.favorito-wrapper {
+  padding: 0 16px 16px 16px;
+}
+
+.btn-eliminar {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-eliminar:hover {
+  background-color: #c82333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .plant-grid {
+    grid-template-columns: 1fr;
+  }
+}
