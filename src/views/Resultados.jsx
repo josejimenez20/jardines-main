@@ -51,7 +51,7 @@ export default function Resultados() {
               style={{ cursor: "pointer" }}
             >
               <img
-                src={planta.imagen}
+                src={planta.imagen.url}
                 alt={planta.nombre}
                 width="300"
                 height="160"
