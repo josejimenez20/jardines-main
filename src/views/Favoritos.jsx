@@ -1,40 +1,45 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // <-- Importar
 import "../styles/Favoritos.css";
+import { useAuth } from "../contexts/useAuth";
+import api from "../shared/api";
 
 export default function Favoritos() {
+  const { user, fetchUserData } = useAuth();
+  const plantas = user?.favorites || []; // Simulando plantas favoritas
   const navigate = useNavigate(); // <-- Hook de navegación
 
-  // Datos simulados de plantas favoritas
-  const plantas = [
-    {
-      id: 1,
-      nombre: "Rosa",
-      nombre_cientifico: "Rosa indica",
-      imagen: "/img/rosa.jpg",
-      exposicion_luz: "Sol pleno",
-      tipo_suelo: "Fértil",
-      frecuencia_agua: "Media",
-    },
-    {
-      id: 2,
-      nombre: "Lavanda",
-      nombre_cientifico: "Lavandula",
-      imagen: "/img/lavanda.jpg",
-      exposicion_luz: "Semi sombra",
-      tipo_suelo: "Arenoso",
-      frecuencia_agua: "Baja",
-    },
-  ];
-
-  const eliminarFavorito = (id) => {
-    alert(`Planta ${id} eliminada de favoritas (simulado)`);
-  };
 
   const verDetalle = (plantaId) => {
     navigate(`/planta/${plantaId}`); // <-- Redirige al detalle de la planta
   };
 
+  useEffect(() => {
+    if (user === null) {
+      fetchUserData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const eliminarFavorito = async (plantaId) => {
+    if (!user) {
+      alert("Debes iniciar sesión para eliminar favoritos.");
+      return;
+    }
+    try {
+      const response = await api.delete("/favoritas", {
+        data: { userId: user._id, plantaId: plantaId },
+      });
+      if (response) {
+        fetchUserData(); // Actualiza los datos del usuario para reflejar el cambio
+      } else {
+        alert("No se pudo eliminar de favoritos. Intenta de nuevo.");
+      }
+    } catch (error) {
+      console.error("Error al eliminar favorito:", error);
+      alert("Hubo un problema al eliminar de favoritos.");
+    }
+  };
   return (
     <main className="favoritas-main">
       <h1>Mis Plantas Favoritas</h1>
@@ -46,17 +51,17 @@ export default function Favoritos() {
 
       <div className="plant-grid">
         {plantas.map((planta) => (
-          <div className="plant-card" key={planta.id}>
+          <div className="plant-card" key={planta._id}>
             <div 
               className="plant-image" 
               onClick={() => verDetalle(planta.id)} 
               style={{ cursor: "pointer" }} // <-- cursor clickeable
             >
-              <img src={planta.imagen} alt={planta.nombre} />
+              <img src={planta.imagen.url} alt={planta.nombre} />
             </div>
             <div 
               className="plant-info" 
-              onClick={() => verDetalle(planta.id)} 
+              onClick={() => verDetalle(planta._id)} 
               style={{ cursor: "pointer" }}
             >
               <div className="plant-name">{planta.nombre}</div>
@@ -70,7 +75,7 @@ export default function Favoritos() {
             <div className="favorito-wrapper">
               <button
                 className="btn-eliminar"
-                onClick={() => eliminarFavorito(planta.id)}
+                onClick={() => eliminarFavorito(planta._id)}
               >
                 🗑 Eliminar
               </button>

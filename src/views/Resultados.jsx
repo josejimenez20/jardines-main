@@ -51,32 +51,18 @@ export default function Resultados() {
     }
   };
 
-  const eliminarFavorito = async (plantaId) => {
-    if (!user) {
-      alert("Debes iniciar sesión para eliminar favoritos.");
-      return;
-    }
-    try {
-      const response = await api.delete("/favoritas", {
-        data: { userId: user._id, plantaId: plantaId },
-      });
-      if (response) {
-        fetchUserData(); // Actualiza los datos del usuario para reflejar el cambio
-      } else {
-        alert("No se pudo eliminar de favoritos. Intenta de nuevo.");
-      }
-    } catch (error) {
-      console.error("Error al eliminar favorito:", error);
-      alert("Hubo un problema al eliminar de favoritos.");
-    }
-  };
-
   const isFavorito = (plantaId) => {
-    return user?.favorites?.includes(plantaId);
+    for (let i = 0; i < user?.favorites?.length; i++) {
+      if (user.favorites[i]._id === plantaId) {
+        return true;
+      }
+    }
+    return false;
   };
   const verDetalle = (plantaId) => {
     navigate(`/planta/${plantaId}`);
   };
+
   return (
     <main className="resultados-main">
       <h1>Recomendaciones de Plantas</h1>
@@ -122,7 +108,7 @@ export default function Resultados() {
               <button
                 className="btn-favorito"
                   onClick={() => {
-                    isFavorito(planta._id) ? eliminarFavorito(planta._id) : agregarFavorito(planta._id)
+                    agregarFavorito(planta._id)
                   }}
                 >
                   {
