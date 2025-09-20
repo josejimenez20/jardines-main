@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../styles/Perfil.css";
+import { useAuth } from "../contexts/useAuth";
 
-export default function Perfil({ user }) {
-  // Valores por defecto si user es undefined
-  const currentUser = user || { name: "Usuario", email: "usuario@correo.com" };
+export default function Perfil() {
+  const { user, fetchUserData } = useAuth();
+
+  useEffect(()=> {
+    if(!user){
+      fetchUserData();
+    }
+  },[])
 
   return (
     <div className="perfil-wrapper">
@@ -13,8 +19,8 @@ export default function Perfil({ user }) {
         </a>
 
         <header className="perfil-header">
-          <h2>Hola, <span>{currentUser.name}</span></h2>
-          <p className="email">📧 {currentUser.email}</p>
+          <h2>Hola, <span>{user?.name}</span></h2>
+          <p className="email">📧 {user?.email}</p>
         </header>
 
         {/* Cambio de contraseña */}
@@ -34,7 +40,7 @@ export default function Perfil({ user }) {
         <section className="perfil-section">
           <h3>Cambiar correo electrónico</h3>
           <form className="formulario">
-            <input type="email" name="email" placeholder="Nuevo correo" value={currentUser.email} readOnly />
+            <input type="email" name="email" placeholder="Nuevo correo" value={user?.email} readOnly />
             <button type="submit" className="btn-primary">Actualizar correo</button>
           </form>
         </section>

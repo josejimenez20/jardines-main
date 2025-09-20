@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom"; // <-- Importar
+import { useNavigate, useSearchParams } from "react-router-dom"; 
 import "../styles/Resultados.css";
 import { usePlanta } from "../contexts/usePlanta";
 import { HeartFilledIcon, HeartIcon } from "../components/icons/Icons";
 import { useAuth } from "../contexts/useAuth";
 import api from "../shared/api";
-import { CgKey } from "react-icons/cg";
 
 export default function Resultados() {
   const { user, fetchUserData } = useAuth();
@@ -13,7 +12,6 @@ export default function Resultados() {
   const { filterPlanta, filterPlant } = usePlanta();
   const [searchParams] = useSearchParams();
 
-  // Leer los filtros desde los query params
   const filters = {
     frecuencia_agua: searchParams.get("frecuencia_agua") || "",
     tipo_suelo: searchParams.get("tipo_suelo") || "",
@@ -25,7 +23,7 @@ export default function Resultados() {
     if (user === null) {
       fetchUserData();
     }
-    filterPlant(filters); // Ejecuta la búsqueda al cargar la página
+    filterPlant(filters); 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams,]);
 
