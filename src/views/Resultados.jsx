@@ -2,9 +2,13 @@ import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom"; // <-- Importar
 import "../styles/Resultados.css";
 import { usePlanta } from "../contexts/usePlanta";
-import { HeartIcon } from "../components/icons/Icons";
+import { HeartFilledIcon, HeartIcon } from "../components/icons/Icons";
+import { useAuth } from "../contexts/useAuth";
+import api from "../shared/api";
+import { CgKey } from "react-icons/cg";
 
 export default function Resultados() {
+  const { user, fetchUserData } = useAuth();
   const navigate = useNavigate();
   const { filterPlanta, filterPlant } = usePlanta();
   const [searchParams] = useSearchParams();
@@ -18,13 +22,58 @@ export default function Resultados() {
   };
 
   useEffect(() => {
+    if (user === null) {
+      fetchUserData();
+    }
     filterPlant(filters); // Ejecuta la búsqueda al cargar la página
-  }, [searchParams]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams,]);
 
-  const agregarFavorito = (plantaId) => {
-    alert(`Planta ${plantaId} añadida a favoritos (simulado)`);
+
+  const agregarFavorito = async (plantaId) => {
+    if (!user) {
+      alert("Debes iniciar sesión para agregar favoritos.");
+      return;
+    }
+    try {
+      const response = await api.post("/favoritas", {
+        userId: user._id,
+        plantaId: plantaId,
+      });
+      if (response) {
+        fetchUserData(); // Actualiza los datos del usuario para reflejar el cambio
+      } else {
+        alert("No se pudo agregar a favoritos. Intenta de nuevo.");
+      }
+    } catch (error) {
+      console.error("Error al agregar favorito:", error);
+      alert("Hubo un problema al agregar a favoritos.");
+    }
   };
 
+  const eliminarFavorito = async (plantaId) => {
+    if (!user) {
+      alert("Debes iniciar sesión para eliminar favoritos.");
+      return;
+    }
+    try {
+      const response = await api.delete("/favoritas", {
+        data: { userId: user._id, plantaId: plantaId },
+      });
+      if (response) {
+        fetchUserData(); // Actualiza los datos del usuario para reflejar el cambio
+      } else {
+        alert("No se pudo eliminar de favoritos. Intenta de nuevo.");
+      }
+    } catch (error) {
+      console.error("Error al eliminar favorito:", error);
+      alert("Hubo un problema al eliminar de favoritos.");
+    }
+  };
+
+  const isFavorito = (plantaId) => {
+    return user?.favorites?.includes(plantaId);
+  };
   const verDetalle = (plantaId) => {
     navigate(`/planta/${plantaId}`);
   };
@@ -45,7 +94,7 @@ export default function Resultados() {
 
         {
           filterPlanta?.data?.map((planta) => (
-          <div className="plant-card" key={planta.id}>
+          <div className="plant-card" key={planta._id}>
             <div 
               className="plant-image" 
               onClick={() => verDetalle(planta.id)} // <-- click en la imagen
@@ -72,9 +121,13 @@ export default function Resultados() {
             <div className="favorito-wrapper">
               <button
                 className="btn-favorito"
-                onClick={() => agregarFavorito(planta.id)}
-              >
-                <HeartIcon  />
+                  onClick={() => {
+                    isFavorito(planta._id) ? eliminarFavorito(planta._id) : agregarFavorito(planta._id)
+                  }}
+                >
+                  {
+                    isFavorito(planta._id) ? <HeartFilledIcon size={32} /> : <HeartIcon size={32} />
+                  }
               </button>
             </div>
           </div>

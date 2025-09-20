@@ -5,6 +5,7 @@ const PlantaContext = createContext(undefined);
 
 export const PlantaContextProvider = ({ children }) => { 
   const [filterPlanta, setFilterPlanta] = useState([]);
+  
 
   const filterPlant = async (filter) => {
     const query = new URLSearchParams(filter).toString(); 

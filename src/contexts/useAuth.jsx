@@ -8,11 +8,6 @@ export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const fetchUserData = async () => {
-    const user = localStorage.getItem("currentUser");
-    if (user) {
-      setUser(JSON.parse(user));
-      return;
-    }
     try {
       const response = await api.get("/users/me");
       const data = response.data;
