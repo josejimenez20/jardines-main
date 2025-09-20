@@ -74,7 +74,7 @@ export default function Resultados() {
                 className="btn-favorito"
                 onClick={() => agregarFavorito(planta.id)}
               >
-                <HeartIcon color="red" />
+                <HeartIcon  />
               </button>
             </div>
           </div>
