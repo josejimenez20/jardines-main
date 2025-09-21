@@ -71,8 +71,19 @@ export const AuthContextProvider = ({ children }) => {
     }
   }
 
+  const changeEmail = async (userData) => {
+    try{
+      const response = await api.post('/auth/change-email',userData);
+      const data = response.data;
+      return data;
+    }catch(e){
+      console.error("Error al cambiar email", e);
+      throw e;
+    }
+  }
+  
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, fetchUserData, changePassword}}>
+    <AuthContext.Provider value={{ user, login, register, logout, fetchUserData, changePassword, changeEmail }}>
       {children}
     </AuthContext.Provider>
   );
