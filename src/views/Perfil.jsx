@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import "../styles/Perfil.css";
 import { useAuth } from "../contexts/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function Perfil() {
-  const { user, fetchUserData, changePassword, changeEmail } = useAuth();
+  const { user, fetchUserData, changePassword, changeEmail, deleteAccount, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(()=> {
     if(!user){
@@ -63,6 +65,18 @@ export default function Perfil() {
     }
   }
 
+  const handleDelete = async() => {
+    try {
+      const response = await deleteAccount(user._id);
+      if(response.message = "User has been deleted successfully"){
+        logout();
+        navigate('/')
+      }
+    }catch(error) {
+      console.error('Error al borrar cuenta', error);
+      throw error;
+    }
+  }
   return (
     <div className="perfil-wrapper">
       <div className="perfil-card">
@@ -102,7 +116,7 @@ export default function Perfil() {
         {/* Eliminar cuenta */}
         <section className="perfil-section">
           <h3>Eliminar cuenta</h3>
-          <button type="button" className="btn-danger">Eliminar cuenta</button>
+          <button type="button" className="btn-danger" onClick={handleDelete}>Eliminar cuenta</button>
         </section>
       </div>
     </div>

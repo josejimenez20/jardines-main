@@ -82,8 +82,18 @@ export const AuthContextProvider = ({ children }) => {
     }
   }
   
+  const deleteAccount = async (id) => {
+    try {
+      const response = await api.delete(`/auth/delete-account/${id}`);
+      const data = response.data;
+      return data;
+    }catch(error){
+      console.error('Error al eliminar cuenta', error);
+      throw error;
+    }
+  }
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, fetchUserData, changePassword, changeEmail }}>
+    <AuthContext.Provider value={{ user, login, register, logout, fetchUserData, changePassword, changeEmail, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
