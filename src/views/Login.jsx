@@ -7,7 +7,7 @@ import api from "../shared/api";
 export default function LoginView() {
   const [municipios, setMunicipios] = useState([]);
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const { register, loginStepOne } = useAuth();
 
   const [showRegister, setShowRegister] = useState(false);
   const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
@@ -41,9 +41,9 @@ export default function LoginView() {
     const password = e.target.password.value;
 
     try {
-      const response = await login({ email, password });
-      if (response) {
-        navigate("/dashboard");
+      const response = await loginStepOne({ email, password });
+      if (response.message) {
+        navigate("/login-step-two");
       } else {
         alert("Error en el inicio de sesión. Revisa tus credenciales.");
       }

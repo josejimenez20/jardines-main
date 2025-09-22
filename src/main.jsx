@@ -14,6 +14,7 @@ import Inicio from "./views/Inicio";
 import Perfil from "./views/Perfil";
 import Favoritos from "./views/Favoritos";
 import Login from "./views/Login";
+import LoginStepTwo from "./views/TwoStepLogin";
 
 // Nuevas views
 import Dashboard from "./views/Dashboard";
@@ -95,6 +96,7 @@ const router = createBrowserRouter([
     ],
   },
   { path: "/login", element: <Login /> },
+  { path: "/login-step-two", element: <LoginStepTwo /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -68,7 +68,7 @@ export default function Perfil() {
   const handleDelete = async() => {
     try {
       const response = await deleteAccount(user._id);
-      if(response.message = "User has been deleted successfully"){
+      if(response.message === "User has been deleted successfully"){
         logout();
         navigate('/')
       }
