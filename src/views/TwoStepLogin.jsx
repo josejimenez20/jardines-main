@@ -37,6 +37,8 @@ export default function TwoStepLogin() {
       }
       const response = await loginStepTwo({ userId: user, code: enteredCode });
       if (response) {
+        localStorage.removeItem("idLoginStepOne");
+        localStorage.setItem("currentUser", JSON.stringify(response));
         navigate("/dashboard");
       }      
     } catch (err) {

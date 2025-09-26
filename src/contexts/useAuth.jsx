@@ -34,8 +34,8 @@ export const AuthContextProvider = ({ children }) => {
       if (userDataResponse.error) {
         throw new Error("Failed to fetch user data");
       }
-      setUser(userDataResponse);
       localStorage.setItem("currentUser", JSON.stringify(userDataResponse));
+      setUser(userDataResponse);
       return userDataResponse;
     } catch (error) {
       console.error("Login error:", error);
