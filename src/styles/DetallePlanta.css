@@ -67,7 +67,9 @@
   gap: 20px;
 }
 
-h2, h3, h4 {
+h2,
+h3,
+h4 {
   color: var(--color-brown);
 }
 
@@ -108,25 +110,6 @@ h2, h3, h4 {
   margin-top: 30px;
 }
 
-.boton-agregar button {
-  background-color: var(--color-light-green);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  font-size: 18px;
-  border-radius: 999px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-  min-width: 280px;
-}
-
-.boton-agregar button:hover {
-  background-color: var(--color-light-brown);
-  transform: translateY(-2px);
-}
-
 .botones-extra {
   display: flex;
   gap: 20px;
@@ -134,22 +117,39 @@ h2, h3, h4 {
   justify-content: center;
 }
 
-.btn-outline-success {
+/* 🎨 Botones personalizados */
+.btn {
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  min-width: 220px;
+  font-weight: bold;
+}
+
+/* Botón éxito (favoritos) */
+.btn-success {
   border: 2px solid var(--color-light-green);
-  color: white;
   background-color: var(--color-light-green);
-}
-
-.btn-outline-success:hover {
-  background-color: var(--color-light-brown);
-}
-
-.btn-outline-secondary {
-  border: 2px solid var(--color-brown);
   color: white;
-  background-color: var(--color-brown);
 }
 
-.btn-outline-secondary:hover {
+.btn-success:hover {
+  background-color: var(--color-light-brown);
+  transform: translateY(-2px);
+}
+
+/* Botón secundario (volver) */
+.btn-secondary {
+  border: 2px solid var(--color-brown);
+  background-color: var(--color-brown);
+  color: white;
+}
+
+.btn-secondary:hover {
   background-color: #5a3929;
+  transform: translateY(-2px);
 }

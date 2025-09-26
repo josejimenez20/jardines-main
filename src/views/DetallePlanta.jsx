@@ -1,4 +1,34 @@
-export default function DetallePlanta({ planta }) {
+import { useEffect, useState } from "react";
+import { usePlanta } from "../contexts/usePlanta";
+import { useNavigate, useParams } from "react-router-dom";
+import "../styles/DetallePlanta.css";
+
+export default function DetallePlanta() {
+  const { id } = useParams();
+  const { obtenerPlanta } = usePlanta();
+  const [planta, setPlanta] = useState(null);
+  const navigate = useNavigate();
+
+  const irAFavoritas = () => {
+    navigate("/favoritos");
+  };
+
+  const irAResultados = () => {
+    navigate("/resultados");
+  };
+
+  useEffect(() => {
+    const fetchPlanta = async () => {
+      try {
+        const data = await obtenerPlanta(id);
+        setPlanta(data);
+      } catch (err) {
+        console.error("Error obteniendo planta:", err);
+      }
+    };
+    fetchPlanta();
+  }, [id, obtenerPlanta]);
+
   // Protege el componente si planta no está disponible
   if (!planta) {
     return (
@@ -12,7 +42,7 @@ export default function DetallePlanta({ planta }) {
   return (
     <main className="detalle-planta-container">
       <div className="imagen-planta">
-        <img src={planta.imagen} alt={planta.nombre} />
+        <img src={planta.imagen.url} alt={planta.nombre} />
         <div className="recomendaciones">
           <h4>¿Por qué te la recomendamos?</h4>
           <ul>
@@ -47,17 +77,15 @@ export default function DetallePlanta({ planta }) {
             <li>Clima {planta.clima}</li>
           </ol>
         </section>
-
-        <div className="boton-agregar">
-          <div className="botones-extra">
-            <button className="btn btn-outline-success">
-              <i className="bi bi-heart-fill me-2"></i> Ver Mis Plantas Favoritas
-            </button>
-            <button className="btn btn-outline-secondary">
-              Volver a Resultados
-            </button>
-          </div>
+        <div className="botones-extra">
+          <button className="btn btn-success" onClick={irAFavoritas}>
+            <i className="bi bi-heart-fill me-2"></i> Ver Mis Plantas Favoritas
+          </button>
+          <button className="btn btn-secondary" onClick={irAResultados}>
+            Volver a Resultados
+          </button>
         </div>
+
       </div>
     </main>
   );

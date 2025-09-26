@@ -6,6 +6,11 @@ const PlantaContext = createContext(undefined);
 export const PlantaContextProvider = ({ children }) => { 
   const [filterPlanta, setFilterPlanta] = useState([]);
   
+  const obtenerPlanta = async (plantaId) => {
+    const response = await api.get(`/plantas/${plantaId}`);
+    return response.data;
+  }
+  
 
   const filterPlant = async (filter) => {
     const query = new URLSearchParams(filter).toString(); 
@@ -15,7 +20,7 @@ export const PlantaContextProvider = ({ children }) => {
   };
 
   return (
-    <PlantaContext.Provider value={{ filterPlanta, filterPlant }}>
+    <PlantaContext.Provider value={{ filterPlanta, filterPlant, obtenerPlanta }}>
       {children}
     </PlantaContext.Provider>
   );

@@ -81,7 +81,7 @@ export default function Resultados() {
           <div className="plant-card" key={planta._id}>
             <div 
               className="plant-image" 
-              onClick={() => verDetalle(planta.id)} // <-- click en la imagen
+              onClick={() => verDetalle(planta._id)} // <-- click en la imagen
               style={{ cursor: "pointer" }}
             >
               <img
@@ -91,7 +91,7 @@ export default function Resultados() {
                 height="160"
               />
             </div>
-            <div className="plant-info" onClick={() => verDetalle(planta.id)} style={{ cursor: "pointer" }}>
+            <div className="plant-info" onClick={() => verDetalle(planta._id)} style={{ cursor: "pointer" }}>
               <div className="plant-name">{planta.nombre}</div>
               <div className="plant-scientific">
                 <em>{planta.nombre_cientifico}</em>
