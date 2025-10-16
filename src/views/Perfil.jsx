@@ -1,17 +1,54 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "../styles/Perfil.css";
 import { useAuth } from "../contexts/useAuth";
 import { useNavigate } from "react-router-dom";
 
 export default function Perfil() {
-  const { user, fetchUserData, changePassword, changeEmail, deleteAccount, logout } = useAuth();
+  const { user, fetchUserData, changePassword, changeEmail, deleteAccount, logout, updateUserPicture } = useAuth();
   const navigate = useNavigate();
-
+  const fileInputRef = useRef(null);
   useEffect(()=> {
     if(!user){
       fetchUserData();
     }
   },[user, fetchUserData]);
+
+  //Imagen de perfil
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validar tipo de archivo
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona una imagen válida (JPEG, PNG, etc.)');
+      return;
+    }
+
+    // Validar tamaño (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen es demasiado grande. Máximo 5MB permitido.');
+      return;
+    }
+
+    try {
+      console.log('📸 Subiendo imagen...');
+      await updateUserPicture(file, user._id);
+      alert('✅ Imagen de perfil actualizada correctamente');
+
+      // Recargar datos del usuario
+      await fetchUserData();
+
+      // Limpiar input
+      event.target.value = '';
+    } catch (error) {
+      console.error('❌ Error subiendo imagen:', error);
+      alert('Error al actualizar la imagen. Intenta de nuevo.');
+      event.target.value = '';
+    }
+  };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -77,6 +114,15 @@ export default function Perfil() {
       throw error;
     }
   }
+  const getProfileImage = () => {
+    if (user?.pictureMongo?.url) {
+      return user.pictureMongo.url;
+    }
+    if (user?.picture) {
+      return user.picture;
+    }
+    return "/default-avatar.png"; // Imagen por defecto
+  };
   return (
     <div className="perfil-wrapper">
       <div className="perfil-card">
@@ -86,7 +132,28 @@ export default function Perfil() {
 
         <header className="perfil-header">
           <h2>Hola, <span>{user?.name}</span></h2>
-          <p className="email">📧 {user?.email}</p>
+          {/* Imagen de perfil clickeable */}
+          <div className="profile-image-container">
+            <img
+              src={getProfileImage()}
+              alt="imagen de perfil"
+              className="img-perfil"
+              onClick={handleImageClick}
+            />
+            <div className="image-overlay" onClick={handleImageClick}>
+              <i className="bi bi-camera-fill"></i>
+              <span>Cambiar imagen</span>
+            </div>
+          </div>
+
+          {/* Input de archivo oculto */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            style={{ display: 'none' }}
+          />
         </header>
 
         {/* Cambio de contraseña */}
@@ -114,10 +181,11 @@ export default function Perfil() {
         <hr />
 
         {/* Eliminar cuenta */}
-        <section className="perfil-section">
-          <h3>Eliminar cuenta</h3>
+        <section className="perfil-section-buttons">
           <button type="button" className="btn-danger" onClick={handleDelete}>Eliminar cuenta</button>
+          <button type="button" className="btn-logout" onClick={() => { logout(); navigate('/') }}>Cerrar sesión</button>
         </section>
+
       </div>
     </div>
   );

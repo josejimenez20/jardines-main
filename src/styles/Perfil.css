@@ -12,6 +12,12 @@ body, .perfil-card {
   min-height: 100vh;
 }
 
+.perfil-section-buttons{
+  margin-bottom: 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
 .perfil-card {
   background-color: #fff;
   border-radius: 24px;
@@ -103,7 +109,20 @@ button:hover {
   background-color: #c74b2c;
   transform: scale(1.03);
 }
-
+.btn-logout {
+  background-color: #7f9c68;;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 18px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+.btn-logout:hover {
+  background-color: #6a8556;
+  transform: scale(1.04);
+}
 .formulario h3 {
   font-size: 20px;
   margin: 10px 0 6px;
@@ -156,3 +175,19 @@ hr {
     font-size: 17px;
   }
 }
+
+.img-perfil {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 16px;
+  border: 4px solid #7f5539;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.img-perfil:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+

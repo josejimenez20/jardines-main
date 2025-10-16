@@ -7,7 +7,7 @@ import api from "../shared/api";
 export default function LoginView() {
   const [municipios, setMunicipios] = useState([]);
   const navigate = useNavigate();
-  const { register, loginStepOne } = useAuth();
+  const { register, loginStepOne, loginGoogle } = useAuth();
 
   const [showRegister, setShowRegister] = useState(false);
   const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
@@ -119,6 +119,14 @@ export default function LoginView() {
               </button>
             </div>
             <button type="submit" className="btn">Iniciar Sesión</button>
+            <button
+              type="button"
+              className="btn google-btn"
+              onClick={loginGoogle}
+            >
+              {/* <img src="/google-icon.svg" alt="Google" className="google-icon" /> */}
+              Iniciar con Google
+            </button>
           </form>
         </div>
 

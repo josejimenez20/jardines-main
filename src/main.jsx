@@ -15,6 +15,7 @@ import Perfil from "./views/Perfil";
 import Favoritos from "./views/Favoritos";
 import Login from "./views/Login";
 import LoginStepTwo from "./views/TwoStepLogin";
+import GoogleCallback from "./views/GoogleCallback";
 
 // Nuevas views
 import Dashboard from "./views/Dashboard";
@@ -25,9 +26,15 @@ import { AuthContextProvider } from "./contexts/useAuth";
 import { PlantaContextProvider } from "./contexts/usePlanta";
 
 // Componente para proteger rutas
+// En main.jsx - actualiza el ProtectedRoute
 const ProtectedRoute = ({ children }) => {
   const user = localStorage.getItem("currentUser");
-  if (!user) return <Navigate to="/login" replace />;
+  const token = localStorage.getItem("accessToken");
+
+  // Verificar tanto el usuario como el token
+  if (!user || !token) {
+    return <Navigate to="/login" replace />;
+  }
   return children;
 };
 
@@ -97,6 +104,7 @@ const router = createBrowserRouter([
   },
   { path: "/login", element: <Login /> },
   { path: "/login-step-two", element: <LoginStepTwo /> },
+  { path: "/auth/google/callback", element: <GoogleCallback /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
