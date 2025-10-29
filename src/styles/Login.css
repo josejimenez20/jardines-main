@@ -269,6 +269,7 @@ select {
   letter-spacing: 1.2px;
   box-shadow: 0 8px 20px rgba(83, 133, 101, 0.3);
   transition: background-color 0.35s ease, box-shadow 0.35s ease;
+  margin-right: 10px;
 }
 
 .btn:hover,
@@ -354,4 +355,5 @@ select {
 .google-icon {
   width: 18px;
   height: 18px;
+  
 }

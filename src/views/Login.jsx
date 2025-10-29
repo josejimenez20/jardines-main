@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Login.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/useAuth";
 import api from "../shared/api";
 
@@ -110,6 +110,7 @@ export default function LoginView() {
                 placeholder="Contraseña"
                 required
               />
+
               <button
                 type="button"
                 className="password-toggle"
@@ -118,14 +119,20 @@ export default function LoginView() {
                 <i className={`bi ${loginPasswordVisible ? "bi-eye" : "bi-eye-slash"}`}></i>
               </button>
             </div>
+            <div className="form-group" style={{ textAlign: "right" }}>
+              <Link to="/forgot-password" className="forgot-password-link">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
             <button type="submit" className="btn">Iniciar Sesión</button>
             <button
               type="button"
               className="btn google-btn"
               onClick={loginGoogle}
             >
-              {/* <img src="/google-icon.svg" alt="Google" className="google-icon" /> */}
-              Iniciar con Google
+             <img src="/simbolo-de-google.png" alt="Google" className="google-icon" /> 
+              Iniciar sesión con Google
             </button>
           </form>
         </div>

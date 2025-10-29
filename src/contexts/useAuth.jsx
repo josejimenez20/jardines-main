@@ -57,9 +57,8 @@ export const AuthContextProvider = ({ children }) => {
       const token = localStorage.getItem('accessToken');
       if (token) {
         // Verificar si el token es válido
-        const response = await api.get('/auth/me', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        // Corregido: Llamar a /users/me ya que el backend usa cookies para autenticación
+        const response = await api.get('/users/me'); 
         setUser(response.data);
       }
     } catch (error) {
@@ -161,7 +160,8 @@ export const AuthContextProvider = ({ children }) => {
 
   const loginStepTwo = async (userData) => {
     try {
-      const token = localStorage.getItem('accessToken');
+      // Nota: Eliminamos el uso de localStorage.getItem('accessToken') aquí, ya que el token
+      // se establece en la respuesta del servidor (cookies) y en el login inicial.
       const response = await api.post("/auth/login-step-two", userData);
       const data = response.data;
 
@@ -176,7 +176,7 @@ export const AuthContextProvider = ({ children }) => {
       }
       setUser(userDataResponse);
       localStorage.setItem("currentUser", JSON.stringify(userDataResponse));
-      localStorage.setItem("accessToken", token);
+      // localStorage.setItem("accessToken", token); // El token ya es manejado por cookies/backend en este punto.
       localStorage.removeItem("idLoginStepOne");
       return userDataResponse;
     } catch (error) {
@@ -184,6 +184,31 @@ export const AuthContextProvider = ({ children }) => {
       throw error;
     }
   };
+  
+  // NUEVAS FUNCIONES PARA RECUPERACIÓN DE CONTRASEÑA
+  const forgotPassword = async (email) => {
+    try {
+      const response = await api.post("/auth/forgot-password", { email });
+      return response.data;
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      throw error.response?.data?.message || "Error al solicitar restablecimiento";
+    }
+  };
+
+  const resetPassword = async (token, newPassword) => {
+    try {
+      const response = await api.post("/auth/reset-password", {
+        token,
+        newPassword,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Reset password error:", error);
+      throw error.response?.data?.message || "Error al restablecer contraseña";
+    }
+  };
+  // FIN NUEVAS FUNCIONES
 
   return (
     <AuthContext.Provider
@@ -201,7 +226,9 @@ export const AuthContextProvider = ({ children }) => {
         loginGoogle,
         checkAuth,
         loading,
-        updateUserPicture
+        updateUserPicture,
+        forgotPassword, // Añadido
+        resetPassword,  // Añadido
       }}
     >
       {children}

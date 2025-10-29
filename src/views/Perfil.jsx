@@ -131,7 +131,7 @@ export default function Perfil() {
         </a>
 
         <header className="perfil-header">
-          <h2>Hola, <span>{user?.name}</span></h2>
+          <h2><span>{user?.name}</span></h2>
           {/* Imagen de perfil clickeable */}
           <div className="profile-image-container">
             <img

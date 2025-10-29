@@ -21,18 +21,20 @@ import GoogleCallback from "./views/GoogleCallback";
 import Dashboard from "./views/Dashboard";
 import Resultados from "./views/Resultados";
 import DetallePlanta from "./views/DetallePlanta";
+import ForgotPassword from "./views/ForgotPassword";
+import ResetPassword from "./views/ResetPassword";
 import ConfiguracionPreferencias from "./views/ConfiguracionPreferencias";
 import { AuthContextProvider } from "./contexts/useAuth";
 import { PlantaContextProvider } from "./contexts/usePlanta";
 
 // Componente para proteger rutas
-// En main.jsx - actualiza el ProtectedRoute
+// CORRECCIÓN: Se elimina la verificación del token de localStorage.
 const ProtectedRoute = ({ children }) => {
   const user = localStorage.getItem("currentUser");
-  const token = localStorage.getItem("accessToken");
+  // Se ha eliminado: const token = localStorage.getItem("accessToken");
 
-  // Verificar tanto el usuario como el token
-  if (!user || !token) {
+  // Verificar solo la existencia del objeto de usuario
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
   return children;
@@ -105,6 +107,10 @@ const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   { path: "/login-step-two", element: <LoginStepTwo /> },
   { path: "/auth/google/callback", element: <GoogleCallback /> },
+  
+  // Rutas de recuperación de contraseña (ya incluidas)
+  { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/reset-password", element: <ResetPassword /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
