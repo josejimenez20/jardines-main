@@ -269,7 +269,7 @@ select {
   letter-spacing: 1.2px;
   box-shadow: 0 8px 20px rgba(83, 133, 101, 0.3);
   transition: background-color 0.35s ease, box-shadow 0.35s ease;
-  margin-right: 10px;
+  /* margin-right: 10px; <-- ESTO CAUSABA EL PROBLEMA */
 }
 
 .btn:hover,
@@ -337,7 +337,24 @@ select {
     visibility: visible !important;
   }
 }
-/* En tu Login.css */
+
+/* --- INICIO DE CORRECCIONES --- */
+
+/* 1. Arreglar enlace "¿Olvidaste tu contraseña?" */
+.forgot-password-link {
+  font-size: 0.9rem;
+  color: var(--color-gray);
+  text-decoration: none; 
+  transition: all 0.2s ease;
+  margin-top: -5px; 
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline; 
+  color: var(--color-brown);
+}
+
+/* 2. Arreglar botón de Google (espaciado del ícono) */
 .google-btn {
   background: white;
   color: #333;
@@ -345,7 +362,7 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px; /* <-- AÑADE ESPACIO entre el ícono y el texto */
 }
 
 .google-btn:hover {
@@ -355,5 +372,21 @@ select {
 .google-icon {
   width: 18px;
   height: 18px;
-  
 }
+
+/* 3. NUEVO: Contenedor para botones a la par */
+.form-buttons-container {
+  display: flex;
+  flex-direction: row; /* A la par */
+  gap: 15px; /* Espacio entre los botones */
+  margin-top: 10px; /* Espacio arriba de los botones */
+}
+
+/* 4. Asegurar que los botones dentro del contenedor ocupen el espacio */
+.form-buttons-container .btn {
+  width: 100%; /* Ocupa 50% del espacio (menos el gap) */
+  margin-top: 0; /* Resetea el margen si lo tenía */
+  margin-right: 0; /* Resetea el margen derecho */
+}
+
+/* --- FIN DE CORRECCIONES --- */

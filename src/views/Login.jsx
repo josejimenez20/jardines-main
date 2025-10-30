@@ -99,7 +99,11 @@ export default function LoginView() {
             <h1>Iniciar Sesión</h1>
             <p>Accede a tu cuenta para ver tus recomendaciones</p>
           </div>
-          <form onSubmit={handleLogin}>
+          {/* --- CORRECCIÓN 1: Añadido 'style' para espaciar los botones --- */}
+          <form 
+            onSubmit={handleLogin} 
+            style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}
+          >
             <div className="form-group">
               <input type="email" name="email" placeholder="Correo electrónico" required />
             </div>
@@ -119,7 +123,9 @@ export default function LoginView() {
                 <i className={`bi ${loginPasswordVisible ? "bi-eye" : "bi-eye-slash"}`}></i>
               </button>
             </div>
-            <div className="form-group" style={{ textAlign: "right" }}>
+            
+            {/* --- CORRECCIÓN 2: Añadido 'className' al Link --- */}
+            <div className="form-group" style={{ textAlign: "right", marginTop: '-5px', marginBottom: '-5px' }}>
               <Link to="/forgot-password" className="forgot-password-link">
                 ¿Olvidaste tu contraseña?
               </Link>
@@ -131,9 +137,59 @@ export default function LoginView() {
               className="btn google-btn"
               onClick={loginGoogle}
             >
-             <img src="/simbolo-de-google.png" alt="Google" className="google-icon" /> 
-              Iniciar sesión con Google
+              <img src="/simbolo-de-google.png" alt="Google" className="google-icon" />
+              {/* --- CORRECCIÓN 3: Añadido espacio &nbsp; --- */}
+              &nbsp; Iniciar sesión con Google
             </button>
+          </form>
+        </div>
+
+        {/* Formulario Registro */}
+        <div className="form-container register-container">
+          <div className="form-header">
+            <h1>Crear Cuenta</h1>
+            <p>Comienza a recibir recomendaciones para tu jardín</p>
+          </div>
+          {/* (Se asume que el formulario de registro también necesita el espaciado) */}
+          <form 
+            onSubmit={handleRegister}
+            style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}
+          >
+            <div className="form-group">
+              <input type="text" name="name" placeholder="Nombre" required />
+            </div>
+            <div className="form-group">
+              <input type="email" name="email" placeholder="Correo electrónico" required />
+            </div>
+            <div className="form-group password-wrapper">
+              <input
+                type={registerPasswordVisible ? "text" : "password"}
+                name="password"
+                placeholder="Contraseña"
+                required
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => togglePassword("register")}
+              >
+                <i className={`bi ${registerPasswordVisible ? "bi-eye" : "bi-eye-slash"}`}></i>
+              </button>
+            </div>
+            <div className="form-group">
+              <select name="municipio" required defaultValue="">
+                <option value="" disabled hidden>
+                  Selecciona un municipio
+                </option>
+                {
+                  municipios.map(mun => (
+                    <option key={mun._id} value={mun._id}>{mun.name}</option>
+                  ))
+               }
+              </select>
+            </div>
+            <p className="note">Podrás personalizar más tus recomendaciones después</p>
+            <button type="submit" className="btn">Registrate</button>
           </form>
         </div>
 
