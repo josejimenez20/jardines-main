@@ -1,8 +1,282 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../styles/Perfil.css";
+import "../styles/Progreso.css"; // <-- 1. IMPORTAR NUEVO CSS
 import { useAuth } from "../contexts/useAuth";
 import { useNavigate } from "react-router-dom";
-import toast from 'react-hot-toast'; // <-- IMPORTAR TOAST
+import toast from 'react-hot-toast'; // (Asumimos que ya lo tienes)
+
+// Componente de Progreso (para mantener Perfil.jsx limpio)
+const ProgresoJardin = () => {
+  const { getProgreso, uploadProgreso, deleteProgresoFoto } = useAuth();
+
+  const [progresoFotos, setProgresoFotos] = useState([]); // Galería
+  const [selectedFiles, setSelectedFiles] = useState([]); // Previsualización
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [abortController, setAbortController] = useState(null);
+  
+  const fileInputRef = useRef(null);
+
+  // Cargar galería al inicio
+  useEffect(() => {
+    fetchProgreso();
+  }, []);
+
+  const fetchProgreso = async () => {
+    try {
+      const fotos = await getProgreso();
+      setProgresoFotos(fotos);
+    } catch (error) {
+      toast.error(error.message || "Error al cargar galería de progreso.");
+    }
+  };
+
+  // Manejar selección de archivos
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    
+    if (files.length > 5) {
+      toast.error("Puedes subir un máximo de 5 imágenes a la vez.");
+      return;
+    }
+
+    const validFiles = [];
+    for (const file of files) {
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        toast.error(`Formato inválido: ${file.name} (Solo JPG, PNG)`);
+        continue;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`Tamaño excedido: ${file.name} (Máx 5MB)`);
+        continue;
+      }
+      
+      file.preview = URL.createObjectURL(file);
+      validFiles.push(file);
+    }
+
+    setSelectedFiles(validFiles);
+    event.target.value = null; 
+  };
+
+  // Quitar de la previsualización
+  const handleRemovePreview = (index) => {
+    URL.revokeObjectURL(selectedFiles[index].preview);
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
+  };
+
+  // Subir las fotos
+  const handleUpload = async () => {
+    if (selectedFiles.length === 0) return;
+
+    const formData = new FormData();
+    selectedFiles.forEach(file => {
+      formData.append('files', file); 
+    });
+
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    try {
+      const onUploadProgress = (progressEvent) => {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        setUploadProgress(percent);
+      };
+
+      await uploadProgreso(formData, onUploadProgress, controller.signal);
+
+      toast.success("¡Fotos subidas correctamente!");
+      setSelectedFiles([]); 
+      await fetchProgreso(); 
+
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        toast.error("Subida cancelada.");
+      } else {
+        toast.error(error.message || "Error al subir las fotos.");
+      }
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      setAbortController(null);
+      selectedFiles.forEach(file => URL.revokeObjectURL(file.preview));
+    }
+  };
+
+  // Cancelar subida
+  const handleCancelUpload = () => {
+    if (abortController) {
+      abortController.abort();
+    }
+  };
+
+  // --- INICIO DE CORRECCIÓN VISUAL DEL TOAST ---
+  // Eliminar foto de la galería
+  const handleDelete = async (imageId) => {
+    toast((t) => (
+      // 1. Contenedor vertical
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontFamily: 'Arial, sans-serif', fontSize: '15px', color: '#333' }}>
+          ¿Eliminar esta foto?
+        </span>
+        {/* 2. Contenedor horizontal para botones */}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button 
+            onClick={() => {
+              toast.dismiss(t.id);
+              confirmDelete(imageId);
+            }} 
+            style={{ 
+              background: '#DC3545', // Rojo
+              color: 'white', 
+              border: 'none', 
+              padding: '8px 12px', 
+              borderRadius: '6px', 
+              cursor: 'pointer',
+              fontFamily: 'Arial, sans-serif',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}
+          >
+            Eliminar
+          </button>
+          <button 
+            onClick={() => toast.dismiss(t.id)}
+            style={{ 
+              background: '#6C757D', // Gris
+              color: 'white', 
+              border: 'none', 
+              padding: '8px 12px', 
+              borderRadius: '6px', 
+              cursor: 'pointer',
+              fontFamily: 'Arial, sans-serif',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    ), { 
+      duration: 6000,
+      style: { // 3. Estilo del toast principal
+        padding: '12px 16px', // Reducir padding
+        borderRadius: '8px',
+      },
+    });
+  };
+  // --- FIN DE CORRECCIÓN VISUAL DEL TOAST ---
+
+  const confirmDelete = async (imageId) => {
+    const toastId = toast.loading('Eliminando...');
+    try {
+      await deleteProgresoFoto(imageId);
+      toast.success('Foto eliminada.', { id: toastId });
+      await fetchProgreso(); // Recargar galería
+    } catch (error) {
+      toast.error(error.message, { id: toastId });
+    }
+  };
+
+  return (
+    <section className="progreso-section">
+      <hr />
+      <h3>Progreso del jardín</h3>
+      
+      {/* 1. Botón para abrir el selector (usa el ref) */}
+      <button 
+        type="button" 
+        className="progreso-btn-primary" 
+        onClick={() => fileInputRef.current.click()}
+        disabled={isUploading}
+      >
+        Subir foto del progreso
+      </button>
+      
+      {/* 2. Input de archivo (oculto) */}
+      <input 
+        type="file" 
+        multiple
+        accept="image/png, image/jpeg"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="progreso-input-hidden"
+      />
+
+      {/* 3. Área de Previsualización */}
+      {selectedFiles.length > 0 && (
+        <div className="progreso-preview-area">
+          {selectedFiles.map((file, index) => (
+            <div key={index} className="progreso-preview-item">
+              <img src={file.preview} alt={file.name} />
+              <button 
+                className="progreso-preview-remove"
+                onClick={() => handleRemovePreview(index)}
+                disabled={isUploading}
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 4. Botón de Subida y Barra de Progreso */}
+      {selectedFiles.length > 0 && !isUploading && (
+        <button 
+          type="button" 
+          className="progreso-btn-primary" 
+          style={{ marginTop: '15px' }}
+          onClick={handleUpload}
+        >
+          Confirmar y Subir {selectedFiles.length} {selectedFiles.length > 1 ? 'fotos' : 'foto'}
+        </button>
+      )}
+
+      {isUploading && (
+        <div className="progreso-upload-wrapper">
+          <progress className="progreso-upload-bar" value={uploadProgress} max="100"></progress>
+          <span className="progreso-upload-text">{uploadProgress}%</span>
+          <button 
+            type="button" 
+            className="progreso-upload-cancel" 
+            onClick={handleCancelUpload}
+          >
+            Cancelar subida
+          </button>
+        </div>
+      )}
+
+      {/* 5. Galería de Fotos Subidas */}
+      <h3 style={{ marginTop: '30px' }}>Mi Galería</h3>
+      {progresoFotos.length > 0 ? (
+        <div className="progreso-gallery">
+          {progresoFotos.map((foto) => (
+            <div key={foto._id} className="progreso-image-card">
+              <img src={foto.url} alt={foto.title || 'Progreso'} />
+              <button 
+                className="progreso-image-delete"
+                onClick={() => handleDelete(foto._id)}
+              >
+                Eliminar
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="progreso-empty-text">Aún no has subido fotos de tu progreso.</p>
+      )}
+    </section>
+  );
+};
+
+
+// --- COMPONENTE PRINCIPAL (PERFIL) ---
 
 export default function Perfil() {
   const { user, fetchUserData, changePassword, changeEmail, deleteAccount, logout, updateUserPicture, updateUserName } = useAuth();
@@ -18,7 +292,6 @@ export default function Perfil() {
     }
   },[user, fetchUserData]);
 
-  //Imagen de perfil
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
@@ -28,25 +301,23 @@ export default function Perfil() {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Por favor selecciona una imagen válida (JPEG, PNG, etc.)'); // <-- Reemplazado
+      toast.error('Por favor selecciona una imagen válida (JPEG, PNG, etc.)');
       return;
     }
-
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('La imagen es demasiado grande. Máximo 5MB permitido.'); // <-- Reemplazado
+      toast.error('La imagen es demasiado grande. Máximo 5MB permitido.');
       return;
     }
 
-    const toastId = toast.loading('Subiendo imagen...'); // <-- Toast de carga
+    const toastId = toast.loading('Subiendo imagen...');
     try {
       await updateUserPicture(file, user._id);
-      toast.success('Imagen de perfil actualizada.', { id: toastId }); // <-- Reemplazado
-
+      toast.success('Imagen de perfil actualizada.', { id: toastId });
       await fetchUserData();
       event.target.value = '';
     } catch (error) {
       console.error('❌ Error subiendo imagen:', error);
-      toast.error('Error al actualizar la imagen.', { id: toastId }); // <-- Reemplazado
+      toast.error('Error al actualizar la imagen.', { id: toastId });
       event.target.value = '';
     }
   };
@@ -54,20 +325,20 @@ export default function Perfil() {
   const handleChangeName = async (e) => {
     e.preventDefault();
     if (!newName || newName.trim() === "") {
-      toast.error("El nombre no puede estar vacío."); // <-- Reemplazado
+      toast.error("El nombre no puede estar vacío.");
       return;
     }
     if (newName === user.name) {
-      toast.error("El nombre es el mismo."); // <-- Reemplazado
+      toast.error("El nombre es el mismo.");
       return;
     }
 
     const toastId = toast.loading('Actualizando nombre...');
     try {
       await updateUserName(user._id, newName.trim());
-      toast.success("Nombre actualizado con éxito.", { id: toastId }); // <-- Reemplazado
+      toast.success("Nombre actualizado con éxito.", { id: toastId });
     } catch (error) {
-      toast.error(`Error: ${error.message || "No se pudo cambiar el nombre."}`, { id: toastId }); // <-- Reemplazado
+      toast.error(`Error: ${error.message || "No se pudo cambiar el nombre."}`, { id: toastId });
       console.error("Error al cambiar el nombre:", error);
     }
   };
@@ -79,7 +350,7 @@ export default function Perfil() {
     const confirm_password = e.target.confirm_password.value;
 
     if(new_password !== confirm_password){
-      toast.error("Las nuevas contraseñas no coinciden."); // <-- Reemplazado
+      toast.error("Las nuevas contraseñas no coinciden.");
       return;
     }
     const userData = {
@@ -91,13 +362,11 @@ export default function Perfil() {
     
     const toastId = toast.loading('Actualizando contraseña...');
     try{
-      const response = await changePassword(userData);
-      // Asumiendo que el backend responde con éxito (el DTO valida la contraseña)
-      toast.success("Contraseña actualizada con éxito.", { id: toastId }); // <-- Reemplazado
+      await changePassword(userData);
+      toast.success("Contraseña actualizada con éxito.", { id: toastId });
       e.target.reset();
     }catch(e){
-      // El backend (auth.service) arroja UnauthorizedException si la contraseña actual es incorrecta
-      toast.error(e.response?.data?.message || "Error al cambiar la contraseña.", { id: toastId }); // <-- Reemplazado
+      toast.error(e.response?.data?.message || "Error al cambiar la contraseña.", { id: toastId });
       console.error("Error al cambiar la contraseña:", e);
     }
   }
@@ -115,49 +384,85 @@ export default function Perfil() {
     try{
       const response = await changeEmail(userData);
       if (response.message === "El correo electrónico ha sido cambiado exitosamente"){
-        toast.success("Correo electrónico actualizado.", { id: toastId }); // <-- Reemplazado
+        toast.success("Correo electrónico actualizado.", { id: toastId });
         e.target.reset();
       } else {
-        toast.error(response.message || "No se pudo cambiar el correo.", { id: toastId }); // <-- Reemplazado
+        toast.error(response.message || "No se pudo cambiar el correo.", { id: toastId });
       }
     }catch(e){
-      toast.error(e.response?.data?.message || "Error al cambiar el correo.", { id: toastId }); // <-- Reemplazado
+      toast.error(e.response?.data?.message || "Error al cambiar el correo.", { id: toastId });
       console.error("Error al cambiar el correo electrónico:", e);
     }
   }
 
+  // --- INICIO DE CORRECCIÓN VISUAL DEL TOAST ---
   const handleDelete = async() => {
-    // Usamos un toast especial de confirmación
     toast((t) => (
-      <span>
-        ¿Seguro que quieres eliminar tu cuenta?
-        <button 
-          onClick={() => {
-            toast.dismiss(t.id);
-            confirmDeleteAccount();
-          }} 
-          style={{ background: '#E74C3C', color: 'white', margin: '0 8px' }}
-        >
-          Eliminar
-        </button>
-        <button onClick={() => toast.dismiss(t.id)}>
-          Cancelar
-        </button>
-      </span>
-    ), { duration: 6000 });
+      // 1. Contenedor vertical
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontFamily: 'Arial, sans-serif', fontSize: '15px', color: '#333', textAlign: 'center' }}>
+          ¿Seguro que quieres eliminar tu cuenta?
+        </span>
+        {/* 2. Contenedor horizontal para botones */}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button 
+            onClick={() => {
+              toast.dismiss(t.id);
+              confirmDeleteAccount();
+            }} 
+            style={{ 
+              background: '#E74C3C', // Rojo (del código original)
+              color: 'white', 
+              border: 'none', 
+              padding: '8px 12px', 
+              borderRadius: '6px', 
+              cursor: 'pointer',
+              fontFamily: 'Arial, sans-serif',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}
+          >
+            Eliminar
+          </button>
+          <button 
+            onClick={() => toast.dismiss(t.id)}
+            style={{ 
+              background: '#6C757D', // Gris
+              color: 'white', 
+              border: 'none', 
+              padding: '8px 12px', 
+              borderRadius: '6px', 
+              cursor: 'pointer',
+              fontFamily: 'Arial, sans-serif',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    ), { 
+      duration: 6000,
+      style: { // 3. Estilo del toast principal
+        padding: '12px 16px', // Reducir padding
+        borderRadius: '8px',
+      },
+    });
   }
+  // --- FIN DE CORRECCIÓN VISUAL DEL TOAST ---
   
   const confirmDeleteAccount = async () => {
     const toastId = toast.loading('Eliminando cuenta...');
     try {
       const response = await deleteAccount(user._id);
       if(response.message === "User has been deleted successfully"){
-        toast.success("Cuenta eliminada.", { id: toastId }); // <-- Reemplazado
+        toast.success("Cuenta eliminada.", { id: toastId });
         logout();
         navigate('/');
       }
     }catch(error) {
-      toast.error("Error al eliminar la cuenta.", { id: toastId }); // <-- Reemplazado
+      toast.error("Error al eliminar la cuenta.", { id: toastId });
       console.error('Error al borrar cuenta', error);
       throw error;
     }
@@ -218,8 +523,8 @@ export default function Perfil() {
             <button type="submit" className="btn-primary">Actualizar nombre</button>
           </form>
         </section>
+        
         <hr />
-
 
         <section className="perfil-section">
           <h3>Cambiar contraseña</h3>
@@ -241,6 +546,8 @@ export default function Perfil() {
           </form>
         </section>
 
+        <ProgresoJardin />
+  
         <hr />
 
         <section className="perfil-section-buttons">

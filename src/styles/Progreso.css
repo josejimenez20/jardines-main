@@ -1,0 +1,214 @@
+/*
+  Estilos para la sección "Progreso del Jardín"
+  Basado en las especificaciones de Azure (Tipografía Arial, colores específicos)
+*/
+
+/* Contenedor de la sección */
+.progreso-section {
+  font-family: Arial, sans-serif;
+  color: #212529;
+}
+
+/* Título de la sección (se hereda de .formulario h3 en Perfil.css) */
+.progreso-section h3 {
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  margin: 10px 0 6px;
+  color: #5c4033; /* Heredado de Perfil.css */
+  font-weight: bold;
+}
+
+/* Botón principal de subida */
+.progreso-btn-primary {
+  background: #28A745;
+  color: #FFFFFF;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  width: 100%;
+  height: 45px;
+  border: none;
+  cursor: pointer;
+  padding: 0.6em 1.2em; /* Padding de fallback */
+  transition: background-color 0.2s;
+}
+
+.progreso-btn-primary:hover {
+  background: #286735;
+}
+
+/* Botón secundario (Gris) - Para Eliminar */
+.progreso-btn-secondary {
+  background: #6C757D;
+  color: #FFFFFF;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  transition: background-color 0.2s;
+}
+
+.progreso-btn-secondary:hover {
+  background: #5a6268;
+}
+
+/* Input de archivo oculto */
+.progreso-input-hidden {
+  display: none;
+}
+
+/* --- Área de Previsualización --- */
+
+.progreso-preview-area {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.progreso-preview-item {
+  position: relative;
+  border: 1px dashed #A0A7B0;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100px;
+}
+
+.progreso-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Botón 'X' para quitar de la previsualización */
+.progreso-preview-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  line-height: 20px;
+}
+
+/* --- Barra de Progreso --- */
+
+.progreso-upload-wrapper {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.progreso-upload-bar {
+  width: 100%;
+  height: 15px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #A0A7B0;
+}
+
+/* Estilo para Chrome/Safari */
+.progreso-upload-bar::-webkit-progress-bar {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+.progreso-upload-bar::-webkit-progress-value {
+  background-color: #007BFF; /* Color Azul de progreso */
+  transition: width 0.3s ease;
+}
+
+/* Estilo para Firefox */
+.progreso-upload-bar::-moz-progress-bar {
+  background-color: #007BFF;
+  border-radius: 8px;
+  transition: width 0.3s ease;
+}
+
+.progreso-upload-text {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #333333;
+  font-weight: bold;
+}
+
+.progreso-upload-cancel {
+  background: #DC3545; /* Rojo para cancelar */
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* --- Galería de Progreso (Fotos ya subidas) --- */
+
+.progreso-gallery {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.progreso-image-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: 150px;
+}
+
+.progreso-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Botón 'Eliminar' sobre la imagen de la galería */
+.progreso-image-delete {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  /* Reutiliza el estilo del botón secundario */
+  background: #6C757D;
+  color: #FFFFFF;
+  font-family: Arial, sans-serif;
+  font-size: 12px; /* Más pequeño para la tarjeta */
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: background-color 0.2s;
+  opacity: 0.8;
+}
+
+.progreso-image-card:hover .progreso-image-delete {
+  opacity: 1;
+}
+
+.progreso-image-delete:hover {
+  background: #5a6268;
+}
+
+.progreso-empty-text {
+  font-family: Arial, sans-serif;
+  color: #555555;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+}

@@ -126,25 +126,15 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
   
-  // --- INICIO DE CORRECCIÓN ---
   const updateUserName = async (userId, newName) => {
     try {
-      // 1. Enviamos la actualización (PUT) al backend
       await api.put(`/users/${userId}`, { name: newName });
-      
-      // 2. NO confiamos en la respuesta.
-      // En su lugar, volvemos a llamar a fetchUserData()
-      // Esta función SÍ obtiene el usuario con la imagen ("populada").
-      await fetchUserData();
-
-      // fetchUserData() ya actualiza el estado (setUser) y el localStorage.
-
+      await fetchUserData(); // Recargamos datos para mantener la foto
     } catch (error) {
       console.error('Error updating user name:', error);
       throw error.response?.data || new Error("Error al actualizar el nombre");
     }
   };
-  // --- FIN DE CORRECCIÓN ---
 
   const deleteAccount = async (id) => {
     try {
@@ -220,6 +210,55 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // --- NUEVAS FUNCIONES PARA "PROGRESO DEL JARDÍN" ---
+
+  /**
+   * Obtiene la galería de progreso del usuario.
+   */
+  const getProgreso = async () => {
+    try {
+      const response = await api.get('/progreso');
+      return response.data.images || []; // Devuelve el array de imágenes
+    } catch (error) {
+      console.error("Error obteniendo progreso:", error);
+      throw error.response?.data || new Error("Error al cargar el progreso");
+    }
+  };
+
+  /**
+   * Sube fotos de progreso.
+   * onUploadProgress es una función callback para la barra de progreso.
+   */
+  const uploadProgreso = async (formData, onUploadProgress, cancelSignal) => {
+    try {
+      const response = await api.post('/progreso/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress, // Pasa el callback a axios
+        signal: cancelSignal, // Pasa la señal de cancelación
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error subiendo fotos:", error);
+      throw error.response?.data || new Error("Error al subir fotos");
+    }
+  };
+
+  /**
+   * Elimina una foto de progreso específica.
+   */
+  const deleteProgresoFoto = async (imageId) => {
+    try {
+      const response = await api.delete(`/progreso/image/${imageId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error eliminando foto:", error);
+      throw error.response?.data || new Error("Error al eliminar la foto");
+    }
+  };
+
+
   return (
     <AuthContext.Provider
       value={{
@@ -240,6 +279,10 @@ export const AuthContextProvider = ({ children }) => {
         forgotPassword, 
         resetPassword,
         updateUserName,
+        // --- AÑADIR NUEVAS FUNCIONES ---
+        getProgreso,
+        uploadProgreso,
+        deleteProgresoFoto,
       }}
     >
       {children}
@@ -247,7 +290,6 @@ export const AuthContextProvider = ({ children }) => {
   );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

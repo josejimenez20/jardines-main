@@ -36,16 +36,30 @@ body, .perfil-card {
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
 }
 
+/* --- INICIO DE LA CORRECCIÓN --- */
+
 .perfil-card h2 {
-  font-size: 26px;
+  font-size: 28px; /* Tamaño base para "Hola," */
   color: #6e3b28;
   margin-bottom: 6px;
   font-weight: 700;
+  
+  /* Usamos flexbox para alinear "Hola," y el nombre */
+  display: flex;
+  justify-content: center;
+  align-items: baseline; /* Alinea la base del texto */
+  gap: 8px; /* Espacio entre "Hola," y el nombre */
+  flex-wrap: wrap; /* Si el nombre es muy largo en móviles */
 }
 
 .perfil-card h2 span {
   color: #7f5539;
+  font-size: 28px; /* Hacemos el nombre "un poquito más grande" */
+  font-weight: 700; /* Nos aseguramos que también sea bold */
 }
+
+/* --- FIN DE LA CORRECCIÓN --- */
+
 
 .email {
   color: #7f5539;
@@ -62,7 +76,8 @@ body, .perfil-card {
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="text"] { /* Añadido input[type="text"] para el nombre */
   padding: 12px 14px;
   border: 2px solid #ddd;
   border-radius: 12px;
@@ -162,7 +177,11 @@ hr {
   }
 
   .perfil-card h2 {
-    font-size: 22px;
+    font-size: 22px; /* Reducimos "Hola," en móvil */
+  }
+  
+  .perfil-card h2 span {
+     font-size: 24px; /* Reducimos el nombre en móvil */
   }
 
   .formulario h3 {
@@ -190,4 +209,3 @@ hr {
   box-shadow: 0 6px 16px rgba(0,0,0,0.15);
   cursor: pointer;
 }
-
