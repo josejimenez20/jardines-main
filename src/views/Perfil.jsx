@@ -1,78 +1,73 @@
-import React, { useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../styles/Perfil.css";
 import { useAuth } from "../contexts/useAuth";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast'; // <-- IMPORTAR TOAST
 
 export default function Perfil() {
   const { user, fetchUserData, changePassword, changeEmail, deleteAccount, logout, updateUserPicture, updateUserName } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  //Estado para el nombre de usuario
   const [newName, setNewName] = useState("");
+
   useEffect(()=> {
     if(!user){
       fetchUserData();
     } else {
-      //Sincroniznos el estado localcon el nombre del usuario
-      setNewName(user.name);
+      setNewName(user.name); 
     }
   },[user, fetchUserData]);
-
 
   //Imagen de perfil
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
+  
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validar tipo de archivo
     if (!file.type.startsWith('image/')) {
-      alert('Por favor selecciona una imagen válida (JPEG, PNG, etc.)');
+      toast.error('Por favor selecciona una imagen válida (JPEG, PNG, etc.)'); // <-- Reemplazado
       return;
     }
 
-    // Validar tamaño (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('La imagen es demasiado grande. Máximo 5MB permitido.');
+      toast.error('La imagen es demasiado grande. Máximo 5MB permitido.'); // <-- Reemplazado
       return;
     }
 
+    const toastId = toast.loading('Subiendo imagen...'); // <-- Toast de carga
     try {
-      console.log('📸 Subiendo imagen...');
       await updateUserPicture(file, user._id);
-      alert('✅ Imagen de perfil actualizada correctamente');
+      toast.success('Imagen de perfil actualizada.', { id: toastId }); // <-- Reemplazado
 
-      // Recargar datos del usuario
       await fetchUserData();
-
-      // Limpiar input
       event.target.value = '';
     } catch (error) {
       console.error('❌ Error subiendo imagen:', error);
-      alert('Error al actualizar la imagen. Intenta de nuevo.');
+      toast.error('Error al actualizar la imagen.', { id: toastId }); // <-- Reemplazado
       event.target.value = '';
     }
   };
+
   const handleChangeName = async (e) => {
     e.preventDefault();
     if (!newName || newName.trim() === "") {
-      alert("El nombre no puede estar vacío.");
+      toast.error("El nombre no puede estar vacío."); // <-- Reemplazado
       return;
     }
     if (newName === user.name) {
-      alert("El nombre es el mismo.");
+      toast.error("El nombre es el mismo."); // <-- Reemplazado
       return;
     }
 
+    const toastId = toast.loading('Actualizando nombre...');
     try {
       await updateUserName(user._id, newName.trim());
-      alert("Nombre actualizado con éxito.");
-      // fetchUserData() se llama automáticamente desde updateUserName
+      toast.success("Nombre actualizado con éxito.", { id: toastId }); // <-- Reemplazado
     } catch (error) {
-      // El backend enviará el mensaje de error (Req #6)
-      alert(`Error: ${error.message || "No se pudo cambiar el nombre."}`);
+      toast.error(`Error: ${error.message || "No se pudo cambiar el nombre."}`, { id: toastId }); // <-- Reemplazado
       console.error("Error al cambiar el nombre:", error);
     }
   };
@@ -84,7 +79,7 @@ export default function Perfil() {
     const confirm_password = e.target.confirm_password.value;
 
     if(new_password !== confirm_password){
-      alert("Las nuevas contraseñas no coinciden.");
+      toast.error("Las nuevas contraseñas no coinciden."); // <-- Reemplazado
       return;
     }
     const userData = {
@@ -93,16 +88,16 @@ export default function Perfil() {
       newPassword: new_password,
       verifyPassword: confirm_password
     }
+    
+    const toastId = toast.loading('Actualizando contraseña...');
     try{
       const response = await changePassword(userData);
-      if(response.message === "Password changed successfully"){
-        alert("Contraseña actualizada con éxito.");
-        e.target.reset();
-      } else {
-        alert(response.message || "No se pudo cambiar la contraseña.");
-      }
+      // Asumiendo que el backend responde con éxito (el DTO valida la contraseña)
+      toast.success("Contraseña actualizada con éxito.", { id: toastId }); // <-- Reemplazado
+      e.target.reset();
     }catch(e){
-      alert("Error al cambiar la contraseña. Intenta de nuevo.");
+      // El backend (auth.service) arroja UnauthorizedException si la contraseña actual es incorrecta
+      toast.error(e.response?.data?.message || "Error al cambiar la contraseña.", { id: toastId }); // <-- Reemplazado
       console.error("Error al cambiar la contraseña:", e);
     }
   }
@@ -115,32 +110,59 @@ export default function Perfil() {
       userId: user._id,
       newEmail: new_email
     }
+    
+    const toastId = toast.loading('Actualizando correo...');
     try{
       const response = await changeEmail(userData);
       if (response.message === "El correo electrónico ha sido cambiado exitosamente"){
-        alert("Correo electrónico actualizado con éxito.");
+        toast.success("Correo electrónico actualizado.", { id: toastId }); // <-- Reemplazado
         e.target.reset();
       } else {
-        alert(response.message || "No se pudo cambiar el correo electrónico.");
+        toast.error(response.message || "No se pudo cambiar el correo.", { id: toastId }); // <-- Reemplazado
       }
     }catch(e){
-      alert("Error al cambiar el correo electrónico. Intenta de nuevo.");
+      toast.error(e.response?.data?.message || "Error al cambiar el correo.", { id: toastId }); // <-- Reemplazado
       console.error("Error al cambiar el correo electrónico:", e);
     }
   }
 
   const handleDelete = async() => {
+    // Usamos un toast especial de confirmación
+    toast((t) => (
+      <span>
+        ¿Seguro que quieres eliminar tu cuenta?
+        <button 
+          onClick={() => {
+            toast.dismiss(t.id);
+            confirmDeleteAccount();
+          }} 
+          style={{ background: '#E74C3C', color: 'white', margin: '0 8px' }}
+        >
+          Eliminar
+        </button>
+        <button onClick={() => toast.dismiss(t.id)}>
+          Cancelar
+        </button>
+      </span>
+    ), { duration: 6000 });
+  }
+  
+  const confirmDeleteAccount = async () => {
+    const toastId = toast.loading('Eliminando cuenta...');
     try {
       const response = await deleteAccount(user._id);
       if(response.message === "User has been deleted successfully"){
+        toast.success("Cuenta eliminada.", { id: toastId }); // <-- Reemplazado
         logout();
-        navigate('/')
+        navigate('/');
       }
     }catch(error) {
+      toast.error("Error al eliminar la cuenta.", { id: toastId }); // <-- Reemplazado
       console.error('Error al borrar cuenta', error);
       throw error;
     }
   }
+
   const getProfileImage = () => {
     if (user?.pictureMongo?.url) {
       return user.pictureMongo.url;
@@ -148,8 +170,9 @@ export default function Perfil() {
     if (user?.picture) {
       return user.picture;
     }
-    return "/default-avatar.png"; // Imagen por defecto
+    return "/default-avatar.png";
   };
+  
   return (
     <div className="perfil-wrapper">
       <div className="perfil-card">
@@ -158,8 +181,7 @@ export default function Perfil() {
         </a>
 
         <header className="perfil-header">
-          <h2><span>{user?.name}</span></h2>
-          {/* Imagen de perfil clickeable */}
+          <h2><span>{newName || user?.name}</span></h2>
           <div className="profile-image-container">
             <img
               src={getProfileImage()}
@@ -173,7 +195,6 @@ export default function Perfil() {
             </div>
           </div>
 
-          {/* Input de archivo oculto */}
           <input
             type="file"
             ref={fileInputRef}
@@ -199,7 +220,7 @@ export default function Perfil() {
         </section>
         <hr />
 
-        {/* Cambio de contraseña */}
+
         <section className="perfil-section">
           <h3>Cambiar contraseña</h3>
           <form className="formulario" onSubmit={handleChangePassword}>
@@ -212,7 +233,6 @@ export default function Perfil() {
 
         <hr />
 
-        {/* Cambio de correo */}
         <section className="perfil-section">
           <h3>Cambiar correo electrónico</h3>
           <form className="formulario" onSubmit={handleChangeEmail}>
@@ -223,7 +243,6 @@ export default function Perfil() {
 
         <hr />
 
-        {/* Eliminar cuenta */}
         <section className="perfil-section-buttons">
           <button type="button" className="btn-danger" onClick={handleDelete}>Eliminar cuenta</button>
           <button type="button" className="btn-logout" onClick={() => { logout(); navigate('/') }}>Cerrar sesión</button>

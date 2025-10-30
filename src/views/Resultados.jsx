@@ -5,6 +5,7 @@ import { usePlanta } from "../contexts/usePlanta";
 import { HeartFilledIcon, HeartIcon } from "../components/icons/Icons";
 import { useAuth } from "../contexts/useAuth";
 import api from "../shared/api";
+import toast from 'react-hot-toast'; // <-- IMPORTAR TOAST
 
 export default function Resultados() {
   const { user, fetchUserData } = useAuth();
@@ -30,22 +31,29 @@ export default function Resultados() {
 
   const agregarFavorito = async (plantaId) => {
     if (!user) {
-      alert("Debes iniciar sesión para agregar favoritos.");
+      toast.error("Debes iniciar sesión para agregar favoritos."); // <-- Reemplazado
       return;
     }
+    
+    // No mostramos toast de carga aquí, es muy rápido
     try {
       const response = await api.post("/favoritas", {
         userId: user._id,
         plantaId: plantaId,
       });
       if (response) {
-        fetchUserData(); // Actualiza los datos del usuario para reflejar el cambio
+        if (response.data.message === 'La planta ya está en favoritos') {
+          toast('Esta planta ya estaba en tus favoritos.'); // <-- Notificación
+        } else {
+          toast.success('Añadida a favoritos.'); // <-- Toast de éxito
+        }
+        fetchUserData();
       } else {
-        alert("No se pudo agregar a favoritos. Intenta de nuevo.");
+        toast.error("No se pudo agregar a favoritos."); // <-- Reemplazado
       }
     } catch (error) {
       console.error("Error al agregar favorito:", error);
-      alert("Hubo un problema al agregar a favoritos.");
+      toast.error("Hubo un problema al agregar a favoritos."); // <-- Reemplazado
     }
   };
 
@@ -81,7 +89,7 @@ export default function Resultados() {
           <div className="plant-card" key={planta._id}>
             <div 
               className="plant-image" 
-              onClick={() => verDetalle(planta._id)} // <-- click en la imagen
+              onClick={() => verDetalle(planta._id)}
               style={{ cursor: "pointer" }}
             >
               <img

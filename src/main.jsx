@@ -8,6 +8,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Layout from "./components/Layout";
+import { Toaster } from "react-hot-toast"; 
 
 // Views existentes
 import Inicio from "./views/Inicio";
@@ -117,6 +118,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthContextProvider>
       <PlantaContextProvider>
+        <Toaster position="top-right" reverseOrder={false} />
         <RouterProvider router={router} />
       </PlantaContextProvider>
     </AuthContextProvider>

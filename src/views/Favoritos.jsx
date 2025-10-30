@@ -1,17 +1,18 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // <-- Importar
+import { useNavigate } from "react-router-dom";
 import "../styles/Favoritos.css";
 import { useAuth } from "../contexts/useAuth";
 import api from "../shared/api";
+import toast from 'react-hot-toast'; // <-- IMPORTAR TOAST
 
 export default function Favoritos() {
   const { user, fetchUserData } = useAuth();
-  const plantas = user?.favorites || []; // Simulando plantas favoritas
-  const navigate = useNavigate(); // <-- Hook de navegación
+  const plantas = user?.favorites || []; 
+  const navigate = useNavigate(); 
 
 
   const verDetalle = (plantaId) => {
-    navigate(`/planta/${plantaId}`); // <-- Redirige al detalle de la planta
+    navigate(`/planta/${plantaId}`); 
   };
 
   useEffect(() => {
@@ -23,23 +24,27 @@ export default function Favoritos() {
 
   const eliminarFavorito = async (plantaId) => {
     if (!user) {
-      alert("Debes iniciar sesión para eliminar favoritos.");
+      toast.error("Debes iniciar sesión para eliminar favoritos."); // <-- Reemplazado
       return;
     }
+    
+    const toastId = toast.loading('Eliminando de favoritos...');
     try {
       const response = await api.delete("/favoritas", {
         data: { userId: user._id, plantaId: plantaId },
       });
       if (response) {
-        fetchUserData(); // Actualiza los datos del usuario para reflejar el cambio
+        toast.success('Planta eliminada de favoritos.', { id: toastId }); // <-- Toast de éxito
+        fetchUserData(); 
       } else {
-        alert("No se pudo eliminar de favoritos. Intenta de nuevo.");
+        toast.error("No se pudo eliminar de favoritos.", { id: toastId }); // <-- Reemplazado
       }
     } catch (error) {
       console.error("Error al eliminar favorito:", error);
-      alert("Hubo un problema al eliminar de favoritos.");
+      toast.error("Hubo un problema al eliminar.", { id: toastId }); // <-- Reemplazado
     }
   };
+  
   return (
     <main className="favoritas-main">
       <h1>Mis Plantas Favoritas</h1>
@@ -55,7 +60,7 @@ export default function Favoritos() {
             <div 
               className="plant-image" 
               onClick={() => verDetalle(planta.id)} 
-              style={{ cursor: "pointer" }} // <-- cursor clickeable
+              style={{ cursor: "pointer" }}
             >
               <img src={planta.imagen.url} alt={planta.nombre} />
             </div>
