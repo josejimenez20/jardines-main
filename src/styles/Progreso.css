@@ -212,3 +212,39 @@
   text-align: center;
   margin-top: 20px;
 }
+
+/* ... (todos los estilos existentes de Progreso.css) ... */
+
+/* --- NUEVOS ESTILOS PARA PRIVACIDAD --- */
+
+.progreso-privacy-wrapper {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.progreso-privacy-select {
+  font-family: Arial, sans-serif;
+  font-size: 12px; /* Reducido para que quepa en la tarjeta */
+  color: #212529;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #A0A7B0;
+  border-radius: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+
+.progreso-image-card:hover .progreso-privacy-wrapper {
+  opacity: 1;
+}
+
+/* Modificamos el botón de eliminar para que esté a la derecha */
+.progreso-image-delete {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  /* ... (estilos existentes del botón) ... */
+}

@@ -258,6 +258,19 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // --- NUEVA FUNCIÓN AÑADIDA ---
+  const updateFotoPrivacy = async (imageId, newPrivacy) => {
+    try {
+      const response = await api.patch(`/progreso/image/${imageId}/privacy`, {
+        privacy: newPrivacy,
+      });
+      return response.data; // { message: 'Privacidad actualizada correctamente' }
+    } catch (error) {
+      console.error("Error actualizando privacidad:", error);
+      throw error.response?.data || new Error("Error al actualizar la privacidad");
+    }
+  };
+
 
   return (
     <AuthContext.Provider

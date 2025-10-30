@@ -6,18 +6,20 @@ import { useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast'; // (Asumimos que ya lo tienes)
 
 // Componente de Progreso (para mantener Perfil.jsx limpio)
+// Componente de Progreso (para mantener Perfil.jsx limpio)
 const ProgresoJardin = () => {
-  const { getProgreso, uploadProgreso, deleteProgresoFoto } = useAuth();
+  // 1. Traer la nueva función
+  const { getProgreso, uploadProgreso, deleteProgresoFoto, updateFotoPrivacy } = useAuth();
 
   const [progresoFotos, setProgresoFotos] = useState([]); // Galería
-  const [selectedFiles, setSelectedFiles] = useState([]); // Previsualización
+  // ... (otros estados: selectedFiles, uploadProgress, etc. SIN CAMBIOS)
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [abortController, setAbortController] = useState(null);
-  
   const fileInputRef = useRef(null);
 
-  // Cargar galería al inicio
+  // ... (useEffect, fetchProgreso, handleFileChange, handleRemovePreview, handleUpload, handleCancelUpload - SIN CAMBIOS)
   useEffect(() => {
     fetchProgreso();
   }, []);
@@ -30,8 +32,7 @@ const ProgresoJardin = () => {
       toast.error(error.message || "Error al cargar galería de progreso.");
     }
   };
-
-  // Manejar selección de archivos
+  
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
     
@@ -39,60 +40,45 @@ const ProgresoJardin = () => {
       toast.error("Puedes subir un máximo de 5 imágenes a la vez.");
       return;
     }
-
     const validFiles = [];
     for (const file of files) {
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
         toast.error(`Formato inválido: ${file.name} (Solo JPG, PNG)`);
         continue;
       }
-      
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`Tamaño excedido: ${file.name} (Máx 5MB)`);
         continue;
       }
-      
       file.preview = URL.createObjectURL(file);
       validFiles.push(file);
     }
-
     setSelectedFiles(validFiles);
     event.target.value = null; 
   };
-
-  // Quitar de la previsualización
+  
   const handleRemovePreview = (index) => {
     URL.revokeObjectURL(selectedFiles[index].preview);
     setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
   };
-
-  // Subir las fotos
+  
   const handleUpload = async () => {
     if (selectedFiles.length === 0) return;
-
     const formData = new FormData();
-    selectedFiles.forEach(file => {
-      formData.append('files', file); 
-    });
-
+    selectedFiles.forEach(file => { formData.append('files', file); });
     setIsUploading(true);
     setUploadProgress(0);
-    
     const controller = new AbortController();
     setAbortController(controller);
-
     try {
       const onUploadProgress = (progressEvent) => {
         const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
         setUploadProgress(percent);
       };
-
       await uploadProgreso(formData, onUploadProgress, controller.signal);
-
       toast.success("¡Fotos subidas correctamente!");
       setSelectedFiles([]); 
       await fetchProgreso(); 
-
     } catch (error) {
       if (error.code === 'ERR_CANCELED') {
         toast.error("Subida cancelada.");
@@ -106,24 +92,19 @@ const ProgresoJardin = () => {
       selectedFiles.forEach(file => URL.revokeObjectURL(file.preview));
     }
   };
-
-  // Cancelar subida
+  
   const handleCancelUpload = () => {
     if (abortController) {
       abortController.abort();
     }
   };
-
-  // --- INICIO DE CORRECCIÓN VISUAL DEL TOAST ---
-  // Eliminar foto de la galería
+  
   const handleDelete = async (imageId) => {
     toast((t) => (
-      // 1. Contenedor vertical
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
         <span style={{ fontFamily: 'Arial, sans-serif', fontSize: '15px', color: '#333' }}>
           ¿Eliminar esta foto?
         </span>
-        {/* 2. Contenedor horizontal para botones */}
         <div style={{ display: 'flex', gap: '8px' }}>
           <button 
             onClick={() => {
@@ -131,7 +112,7 @@ const ProgresoJardin = () => {
               confirmDelete(imageId);
             }} 
             style={{ 
-              background: '#DC3545', // Rojo
+              background: '#DC3545', 
               color: 'white', 
               border: 'none', 
               padding: '8px 12px', 
@@ -147,7 +128,7 @@ const ProgresoJardin = () => {
           <button 
             onClick={() => toast.dismiss(t.id)}
             style={{ 
-              background: '#6C757D', // Gris
+              background: '#6C757D', 
               color: 'white', 
               border: 'none', 
               padding: '8px 12px', 
@@ -164,20 +145,45 @@ const ProgresoJardin = () => {
       </div>
     ), { 
       duration: 6000,
-      style: { // 3. Estilo del toast principal
-        padding: '12px 16px', // Reducir padding
+      style: { 
+        padding: '12px 16px',
         borderRadius: '8px',
       },
     });
   };
-  // --- FIN DE CORRECCIÓN VISUAL DEL TOAST ---
-
+  
   const confirmDelete = async (imageId) => {
     const toastId = toast.loading('Eliminando...');
     try {
       await deleteProgresoFoto(imageId);
       toast.success('Foto eliminada.', { id: toastId });
-      await fetchProgreso(); // Recargar galería
+      await fetchProgreso();
+    } catch (error) {
+      toast.error(error.message, { id: toastId });
+    }
+  };
+
+  // --- NUEVA FUNCIÓN AÑADIDA ---
+  const handlePrivacyChange = async (e, imageId) => {
+    const newPrivacy = e.target.value;
+    
+    // Evitar recargar si no hay cambio
+    const fotoActual = progresoFotos.find(f => f._id === imageId);
+    if (fotoActual.privacy === newPrivacy) return;
+
+    const toastId = toast.loading('Actualizando privacidad...');
+    try {
+      // Requisito: "Enviar al frontend mensajes claros de éxito o error."
+      const response = await updateFotoPrivacy(imageId, newPrivacy);
+      toast.success(response.message, { id: toastId });
+      
+      // Actualizar el estado local para reflejar el cambio en el dropdown
+      setProgresoFotos(prevFotos => 
+        prevFotos.map(foto => 
+          foto._id === imageId ? { ...foto, privacy: newPrivacy } : foto
+        )
+      );
+
     } catch (error) {
       toast.error(error.message, { id: toastId });
     }
@@ -188,8 +194,8 @@ const ProgresoJardin = () => {
       <hr />
       <h3>Progreso del jardín</h3>
       
-      {/* 1. Botón para abrir el selector (usa el ref) */}
-      <button 
+      {/* ... (Botón de subir, input, previsualización, barra de progreso - SIN CAMBIOS) ... */}
+       <button 
         type="button" 
         className="progreso-btn-primary" 
         onClick={() => fileInputRef.current.click()}
@@ -198,7 +204,6 @@ const ProgresoJardin = () => {
         Subir foto del progreso
       </button>
       
-      {/* 2. Input de archivo (oculto) */}
       <input 
         type="file" 
         multiple
@@ -207,8 +212,6 @@ const ProgresoJardin = () => {
         onChange={handleFileChange}
         className="progreso-input-hidden"
       />
-
-      {/* 3. Área de Previsualización */}
       {selectedFiles.length > 0 && (
         <div className="progreso-preview-area">
           {selectedFiles.map((file, index) => (
@@ -225,8 +228,6 @@ const ProgresoJardin = () => {
           ))}
         </div>
       )}
-
-      {/* 4. Botón de Subida y Barra de Progreso */}
       {selectedFiles.length > 0 && !isUploading && (
         <button 
           type="button" 
@@ -237,7 +238,6 @@ const ProgresoJardin = () => {
           Confirmar y Subir {selectedFiles.length} {selectedFiles.length > 1 ? 'fotos' : 'foto'}
         </button>
       )}
-
       {isUploading && (
         <div className="progreso-upload-wrapper">
           <progress className="progreso-upload-bar" value={uploadProgress} max="100"></progress>
@@ -252,13 +252,29 @@ const ProgresoJardin = () => {
         </div>
       )}
 
-      {/* 5. Galería de Fotos Subidas */}
+
+      {/* 5. Galería de Fotos Subidas (MODIFICADA) */}
       <h3 style={{ marginTop: '30px' }}>Mi Galería</h3>
       {progresoFotos.length > 0 ? (
         <div className="progreso-gallery">
           {progresoFotos.map((foto) => (
             <div key={foto._id} className="progreso-image-card">
               <img src={foto.url} alt={foto.title || 'Progreso'} />
+              
+              {/* --- INICIO DE MODIFICACIÓN (Añadir Dropdown) --- */}
+              <div className="progreso-privacy-wrapper">
+                <select 
+                  className="progreso-privacy-select"
+                  value={foto.privacy}
+                  onChange={(e) => handlePrivacyChange(e, foto._id)}
+                >
+                  <option value="Solo yo">Solo yo</option>
+                  <option value="Amigos">Amigos</option>
+                  <option value="Público">Público</option>
+                </select>
+              </div>
+              {/* --- FIN DE MODIFICACIÓN --- */}
+
               <button 
                 className="progreso-image-delete"
                 onClick={() => handleDelete(foto._id)}
@@ -277,7 +293,7 @@ const ProgresoJardin = () => {
 
 
 // --- COMPONENTE PRINCIPAL (PERFIL) ---
-
+// (Este componente no se modifica, solo el sub-componente ProgresoJardin)
 export default function Perfil() {
   const { user, fetchUserData, changePassword, changeEmail, deleteAccount, logout, updateUserPicture, updateUserName } = useAuth();
   const navigate = useNavigate();
@@ -395,15 +411,12 @@ export default function Perfil() {
     }
   }
 
-  // --- INICIO DE CORRECCIÓN VISUAL DEL TOAST ---
   const handleDelete = async() => {
     toast((t) => (
-      // 1. Contenedor vertical
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
         <span style={{ fontFamily: 'Arial, sans-serif', fontSize: '15px', color: '#333', textAlign: 'center' }}>
           ¿Seguro que quieres eliminar tu cuenta?
         </span>
-        {/* 2. Contenedor horizontal para botones */}
         <div style={{ display: 'flex', gap: '8px' }}>
           <button 
             onClick={() => {
@@ -411,7 +424,7 @@ export default function Perfil() {
               confirmDeleteAccount();
             }} 
             style={{ 
-              background: '#E74C3C', // Rojo (del código original)
+              background: '#E74C3C', 
               color: 'white', 
               border: 'none', 
               padding: '8px 12px', 
@@ -427,7 +440,7 @@ export default function Perfil() {
           <button 
             onClick={() => toast.dismiss(t.id)}
             style={{ 
-              background: '#6C757D', // Gris
+              background: '#6C757D', 
               color: 'white', 
               border: 'none', 
               padding: '8px 12px', 
@@ -444,13 +457,12 @@ export default function Perfil() {
       </div>
     ), { 
       duration: 6000,
-      style: { // 3. Estilo del toast principal
-        padding: '12px 16px', // Reducir padding
+      style: { 
+        padding: '12px 16px', 
         borderRadius: '8px',
       },
     });
   }
-  // --- FIN DE CORRECCIÓN VISUAL DEL TOAST ---
   
   const confirmDeleteAccount = async () => {
     const toastId = toast.loading('Eliminando cuenta...');
@@ -486,7 +498,7 @@ export default function Perfil() {
         </a>
 
         <header className="perfil-header">
-          <h2><span>{newName || user?.name}</span></h2>
+          <h2>Hola, <span>{newName || user?.name}</span></h2>
           <div className="profile-image-container">
             <img
               src={getProfileImage()}
@@ -546,8 +558,10 @@ export default function Perfil() {
           </form>
         </section>
 
+        {/* --- INICIO DE SECCIÓN "PROGRESO DEL JARDÍN" --- */}
         <ProgresoJardin />
-  
+        {/* --- FIN DE SECCIÓN "PROGRESO DEL JARDÍN" --- */}
+
         <hr />
 
         <section className="perfil-section-buttons">
