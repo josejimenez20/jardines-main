@@ -81,7 +81,7 @@ export default function ResetPassword() { // <-- Usa export default
           <form onSubmit={handleSubmit} className="two-step-form">
             <input
               type="password"
-              placeholder="Nueva Contraseña (mínimo 8 caracteres)"
+              placeholder="Nueva Contraseña"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
