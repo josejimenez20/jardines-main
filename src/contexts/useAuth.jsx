@@ -26,15 +26,12 @@ export const AuthContextProvider = ({ children }) => {
       const formData = new FormData();
       formData.append('file', file);
 
-      // Agregar otros datos si es necesario
-
       const response = await api.put(`/users/${userId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      // Actualizar el usuario en el estado
       if (response.data) {
         setUser(response.data);
         localStorage.setItem('currentUser', JSON.stringify(response.data));
@@ -56,8 +53,6 @@ export const AuthContextProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('accessToken');
       if (token) {
-        // Verificar si el token es válido
-        // Corregido: Llamar a /users/me ya que el backend usa cookies para autenticación
         const response = await api.get('/users/me'); 
         setUser(response.data);
       }
@@ -130,6 +125,26 @@ export const AuthContextProvider = ({ children }) => {
       throw e;
     }
   };
+  
+  // --- INICIO DE CORRECCIÓN ---
+  const updateUserName = async (userId, newName) => {
+    try {
+      // 1. Enviamos la actualización (PUT) al backend
+      await api.put(`/users/${userId}`, { name: newName });
+      
+      // 2. NO confiamos en la respuesta.
+      // En su lugar, volvemos a llamar a fetchUserData()
+      // Esta función SÍ obtiene el usuario con la imagen ("populada").
+      await fetchUserData();
+
+      // fetchUserData() ya actualiza el estado (setUser) y el localStorage.
+
+    } catch (error) {
+      console.error('Error updating user name:', error);
+      throw error.response?.data || new Error("Error al actualizar el nombre");
+    }
+  };
+  // --- FIN DE CORRECCIÓN ---
 
   const deleteAccount = async (id) => {
     try {
@@ -160,8 +175,6 @@ export const AuthContextProvider = ({ children }) => {
 
   const loginStepTwo = async (userData) => {
     try {
-      // Nota: Eliminamos el uso de localStorage.getItem('accessToken') aquí, ya que el token
-      // se establece en la respuesta del servidor (cookies) y en el login inicial.
       const response = await api.post("/auth/login-step-two", userData);
       const data = response.data;
 
@@ -176,7 +189,6 @@ export const AuthContextProvider = ({ children }) => {
       }
       setUser(userDataResponse);
       localStorage.setItem("currentUser", JSON.stringify(userDataResponse));
-      // localStorage.setItem("accessToken", token); // El token ya es manejado por cookies/backend en este punto.
       localStorage.removeItem("idLoginStepOne");
       return userDataResponse;
     } catch (error) {
@@ -185,7 +197,6 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
   
-  // NUEVAS FUNCIONES PARA RECUPERACIÓN DE CONTRASEÑA
   const forgotPassword = async (email) => {
     try {
       const response = await api.post("/auth/forgot-password", { email });
@@ -208,7 +219,6 @@ export const AuthContextProvider = ({ children }) => {
       throw error.response?.data?.message || "Error al restablecer contraseña";
     }
   };
-  // FIN NUEVAS FUNCIONES
 
   return (
     <AuthContext.Provider
@@ -227,8 +237,9 @@ export const AuthContextProvider = ({ children }) => {
         checkAuth,
         loading,
         updateUserPicture,
-        forgotPassword, // Añadido
-        resetPassword,  // Añadido
+        forgotPassword, 
+        resetPassword,
+        updateUserName,
       }}
     >
       {children}

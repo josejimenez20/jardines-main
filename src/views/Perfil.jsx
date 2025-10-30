@@ -1,17 +1,23 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState} from "react";
 import "../styles/Perfil.css";
 import { useAuth } from "../contexts/useAuth";
 import { useNavigate } from "react-router-dom";
 
 export default function Perfil() {
-  const { user, fetchUserData, changePassword, changeEmail, deleteAccount, logout, updateUserPicture } = useAuth();
+  const { user, fetchUserData, changePassword, changeEmail, deleteAccount, logout, updateUserPicture, updateUserName } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  //Estado para el nombre de usuario
+  const [newName, setNewName] = useState("");
   useEffect(()=> {
     if(!user){
       fetchUserData();
+    } else {
+      //Sincroniznos el estado localcon el nombre del usuario
+      setNewName(user.name);
     }
   },[user, fetchUserData]);
+
 
   //Imagen de perfil
   const handleImageClick = () => {
@@ -47,6 +53,27 @@ export default function Perfil() {
       console.error('❌ Error subiendo imagen:', error);
       alert('Error al actualizar la imagen. Intenta de nuevo.');
       event.target.value = '';
+    }
+  };
+  const handleChangeName = async (e) => {
+    e.preventDefault();
+    if (!newName || newName.trim() === "") {
+      alert("El nombre no puede estar vacío.");
+      return;
+    }
+    if (newName === user.name) {
+      alert("El nombre es el mismo.");
+      return;
+    }
+
+    try {
+      await updateUserName(user._id, newName.trim());
+      alert("Nombre actualizado con éxito.");
+      // fetchUserData() se llama automáticamente desde updateUserName
+    } catch (error) {
+      // El backend enviará el mensaje de error (Req #6)
+      alert(`Error: ${error.message || "No se pudo cambiar el nombre."}`);
+      console.error("Error al cambiar el nombre:", error);
     }
   };
 
@@ -155,6 +182,22 @@ export default function Perfil() {
             style={{ display: 'none' }}
           />
         </header>
+
+        <section className="perfil-section">
+          <h3>Cambiar nombre</h3>
+          <form className="formulario" onSubmit={handleChangeName}>
+            <input 
+              type="text" 
+              name="name" 
+              placeholder="Nuevo nombre" 
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              required 
+            />
+            <button type="submit" className="btn-primary">Actualizar nombre</button>
+          </form>
+        </section>
+        <hr />
 
         {/* Cambio de contraseña */}
         <section className="perfil-section">
